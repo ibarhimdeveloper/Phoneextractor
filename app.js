@@ -1,25 +1,70 @@
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const path = require('path');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
+const crypto = require('crypto');
+const sqlite3 = require('sqlite3').verbose();
+const speakeasy = require('speakeasy');
+const winston = require('winston');
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-const winston = require('winston');
 const axios = require('axios');
-const fs = require('fs');
+const cors = require('cors');
+const bodyParser = require('body-parser');
 
-puppeteer.use(StealthPlugin());
-
+// Initialize Express app
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
+// Apply Puppeteer stealth plugin
+puppeteer.use(StealthPlugin());
+
+// Database setup
+const db = new sqlite3.Database('./database.sqlite');
+
+// Initialize database tables
+db.serialize(() => {
+  db.run(`CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE,
+    password_hash TEXT,
+    role TEXT DEFAULT 'user',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    expires_at DATETIME,
+    revoked BOOLEAN DEFAULT 0,
+    ip_whitelist TEXT,
+    tfa_secret TEXT
+  )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS audit_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    action TEXT,
+    user_id INTEGER,
+    ip_address TEXT,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`);
+});
+
+// Middleware setup
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static('public'));
+app.use(helmet());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100
+});
+app.use(limiter);
+
+// Logger configuration
 const logger = winston.createLogger({
   level: 'info',
   format: winston.format.combine(
@@ -33,10 +78,43 @@ const logger = winston.createLogger({
   ]
 });
 
-const PORT = process.env.PORT || 3000;
-const NUMVERIFY_API_KEY = 'c929995ef8677c74d4881ed70ea1fb5a';
-const activeBrowsers = {};
+// CSRF protection setup
+const csrfTokens = new Map();
+app.use((req, res, next) => {
+  const token = crypto.randomBytes(16).toString('hex');
+  res.locals.csrfToken = token;
+  csrfTokens.set(token, Date.now() + 3600000);
+  next();
+});
 
+// JWT configuration
+const jwtConfig = {
+  secret: crypto.randomBytes(64).toString('hex'),
+  expiresIn: '30m',
+  cookieOptions: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict'
+  }
+};
+
+// Create admin user if not exists
+const adminPassword = 'Admin112122';
+bcrypt.hash(adminPassword, 12, (err, hash) => {
+  if (err) {
+    logger.error('Error creating admin user:', err);
+    return;
+  }
+  db.run(`INSERT OR IGNORE INTO users (username, password_hash, role) 
+          VALUES (?, ?, ?)`, 
+          ['admin', hash, 'admin'],
+          (err) => {
+            if (err) logger.error('Admin creation error:', err);
+          });
+});
+
+// Socket.io setup
+const activeBrowsers = {};
 io.on('connection', (socket) => {
   logger.info(`Client connected: ${socket.id}`);
 
@@ -48,7 +126,7 @@ io.on('connection', (socket) => {
         logger.info(`Scraping stopped for socket: ${socket.id}`);
       } catch (err) {
         logger.error(`Error closing browser for socket ${socket.id}: ${err.message}`);
-        io.to(socket.id).emit('error', 'Failed to cancel the scraping operation.');
+        socket.emit('error', 'Failed to cancel the scraping operation.');
       }
     }
   });
@@ -64,8 +142,9 @@ io.on('connection', (socket) => {
   });
 });
 
+// Utility functions
 function emitPhoneNumber(socketId, number, source) {
-  if (!activeBrowsers[socketId]) return;  // Ensure browser is still active for this socket
+  if (!activeBrowsers[socketId]) return;
   io.to(socketId).emit('phoneNumber', { number, source });
 }
 
@@ -75,7 +154,10 @@ function emitError(socketId, message) {
 
 async function startBrowser(socketId) {
   try {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ 
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
     activeBrowsers[socketId] = browser;
     logger.info(`Browser launched for socket: ${socketId}`);
     return browser;
@@ -95,17 +177,39 @@ function extractPhoneNumbers(text) {
   return matches.map(raw => {
     const number = parsePhoneNumberFromString(raw, 'US');
     if (number?.isValid()) {
-      return number.number; // return in +1XXXXXXXXXX format
+      return number.number;
     }
     return null;
   }).filter(Boolean);
 }
 
+// Authentication middleware
+function verifyAdmin(req, res, next) {
+  const token = req.cookies.jwt;
+  try {
+    const decoded = jwt.verify(token, jwtConfig.secret);
+    if (decoded.role !== 'admin') throw new Error();
+    req.user = decoded;
+    next();
+  } catch (error) {
+    res.status(403).json({ error: 'Admin access required' });
+  }
+}
+
+// Admin endpoints
+app.post('/api/admin/enable-2fa', verifyAdmin, (req, res) => {
+  const secret = speakeasy.generateSecret({ length: 20 });
+  db.run('UPDATE users SET tfa_secret = ? WHERE id = ?', 
+        [secret.base32, req.user.sub]);
+  res.json({ secret: secret.base32, qrCode: secret.otpauth_url });
+});
+
+// Scraping functions
 async function scrapeYellowPages({ searchTerm, location, pages, socketId }) {
   const browser = await startBrowser(socketId);
   if (!browser) return;
   const page = await browser.newPage();
-  const seenNumbers = new Set(); // Store numbers to check for duplicates
+  const seenNumbers = new Set();
 
   try {
     for (let i = 1; i <= pages; i++) {
@@ -116,11 +220,11 @@ async function scrapeYellowPages({ searchTerm, location, pages, socketId }) {
       
       numbers.forEach((number) => {
         if (!seenNumbers.has(number)) {
-          seenNumbers.add(number); // Add to Set to ensure uniqueness
+          seenNumbers.add(number);
           emitPhoneNumber(socketId, number, 'YellowPages');
         }
       });
-      await new Promise((res) => setTimeout(res, 1000));  // Add delay to reduce load
+      await new Promise((res) => setTimeout(res, 1000));
     }
   } catch (err) {
     logger.error(`YellowPages error: ${err.message}`);
@@ -136,7 +240,7 @@ async function scrapeYelp({ searchTerm, location, pages, socketId }) {
   const browser = await startBrowser(socketId);
   if (!browser) return;
   const page = await browser.newPage();
-  const seenNumbers = new Set(); // Store numbers to check for duplicates
+  const seenNumbers = new Set();
 
   try {
     for (let i = 0; i < pages; i++) {
@@ -148,11 +252,11 @@ async function scrapeYelp({ searchTerm, location, pages, socketId }) {
       
       numbers.forEach((number) => {
         if (!seenNumbers.has(number)) {
-          seenNumbers.add(number); // Add to Set to ensure uniqueness
+          seenNumbers.add(number);
           emitPhoneNumber(socketId, number, 'Yelp');
         }
       });
-      await new Promise((res) => setTimeout(res, 1000));  // Add delay to reduce load
+      await new Promise((res) => setTimeout(res, 1000));
     }
   } catch (err) {
     logger.error(`Yelp error: ${err.message}`);
@@ -168,7 +272,7 @@ async function scrapePersonal({ name, socketId }) {
   const browser = await startBrowser(socketId);
   if (!browser) return;
   const page = await browser.newPage();
-  const seenNumbers = new Set(); // Store numbers to check for duplicates
+  const seenNumbers = new Set();
 
   try {
     const url = `https://www.google.com/search?q=${encodeURIComponent(name)}+phone+number`;
@@ -178,7 +282,7 @@ async function scrapePersonal({ name, socketId }) {
     
     numbers.forEach((number) => {
       if (!seenNumbers.has(number)) {
-        seenNumbers.add(number); // Add to Set to ensure uniqueness
+        seenNumbers.add(number);
         emitPhoneNumber(socketId, number, 'Google');
       }
     });
@@ -196,7 +300,7 @@ async function scrapeCustom({ url, depth = 1, socketId }) {
   if (!browser) return;
   const visited = new Set();
   const queue = [url];
-  const seenNumbers = new Set(); // Store numbers to check for duplicates
+  const seenNumbers = new Set();
 
   try {
     while (queue.length && visited.size < depth) {
@@ -211,7 +315,7 @@ async function scrapeCustom({ url, depth = 1, socketId }) {
         
         numbers.forEach((number) => {
           if (!seenNumbers.has(number)) {
-            seenNumbers.add(number); // Add to Set to ensure uniqueness
+            seenNumbers.add(number);
             emitPhoneNumber(socketId, number, 'Custom');
           }
         });
@@ -237,16 +341,12 @@ async function scrapeCustom({ url, depth = 1, socketId }) {
   }
 }
 
+// API endpoints
 app.post('/scrape-global', async (req, res) => {
   const { searchTerm, location, pages, socketId } = req.body;
 
-  // Validate pages input
   if (!searchTerm || !location || !pages || !socketId) {
     return res.status(400).json({ success: false, error: 'Missing required fields.' });
-  }
-
-  if (pages < 1 || pages > 1000) {
-    return res.status(400).json({ success: false, error: 'Pages to scrape must be between 1 and 1000.' });
   }
 
   try {
@@ -269,9 +369,13 @@ app.post('/verify-numbers', async (req, res) => {
   }
 
   const results = [];
+  const NUMVERIFY_API_KEY = 'c929995ef8677c74d4881ed70ea1fb5a';
+  
   for (const phone of numbers) {
     try {
-      const response = await axios.get(`http://apilayer.net/api/validate?access_key=${NUMVERIFY_API_KEY}&number=${encodeURIComponent(phone)}&country_code=US&format=1`);
+      const response = await axios.get(
+        `http://apilayer.net/api/validate?access_key=${NUMVERIFY_API_KEY}&number=${encodeURIComponent(phone)}&country_code=US&format=1`
+      );
       if (response.data) {
         results.push({
           phone,
@@ -290,7 +394,6 @@ app.post('/verify-numbers', async (req, res) => {
   res.json({ success: true, results });
 });
 
-// Scrape YellowPages
 app.post('/scrape-yellowpages', async (req, res) => {
   const { searchTerm, location, pages, socketId } = req.body;
   if (!searchTerm || !location || !pages || !socketId) {
@@ -306,7 +409,6 @@ app.post('/scrape-yellowpages', async (req, res) => {
   }
 });
 
-// Scrape Yelp
 app.post('/scrape-yelp', async (req, res) => {
   const { searchTerm, location, pages, socketId } = req.body;
   if (!searchTerm || !location || !pages || !socketId) {
@@ -322,7 +424,6 @@ app.post('/scrape-yelp', async (req, res) => {
   }
 });
 
-// Scrape Personal
 app.post('/scrape-personal', async (req, res) => {
   const { name, socketId } = req.body;
   if (!name || !socketId) {
@@ -338,7 +439,6 @@ app.post('/scrape-personal', async (req, res) => {
   }
 });
 
-// Scrape Custom URL
 app.post('/scrape-custom', async (req, res) => {
   const { url, depth, socketId } = req.body;
   if (!url || !socketId) {
@@ -354,6 +454,8 @@ app.post('/scrape-custom', async (req, res) => {
   }
 });
 
+// Start server
+const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   logger.info(`Server running on http://localhost:${PORT}`);
 });
