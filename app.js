@@ -18,7 +18,7 @@ const io = new Server(server);
 
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static('public'));
 
 const logger = winston.createLogger({
   level: 'info',
