@@ -30,9 +30,8 @@ const __dirname = dirname(__filename);
 puppeteer.use(StealthPlugin());
 
 // API Keys
-const TWO_CAPTCHA_API_KEY = 'c0a02487c438ee763ff0a37cc87cca9b';
-const NUMVERIFY_API_KEY = 'c929995ef8677c74d4881ed70ea1fb5a';
-process.env.BREVO_API_KEY = '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';
+const BREVO_API_KEY = process.env.BREVO_API_KEY;
+const NUMVERIFY_API_KEY = process.env.NUMVERIFY_API_KEY;
 
 // Initialize Express app
 const app = express();
