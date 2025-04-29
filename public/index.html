@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PhoneScraper Pro | Advanced Phone Number Extractor</title>
+  <meta name="description" content="Professional phone number extraction tool with verification and management features">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="style.css" rel="stylesheet">
+  <link rel="icon" href="/favicon.ico">
+</head>
+
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <nav class="app-sidebar bg-dark">
+      <div class="sidebar-header">
+        <div class="app-logo">
+          <i class="fas fa-phone-alt"></i>
+          <h1>PhoneScraper Pro</h1>
+        </div>
+      </div>
+      
+      <ul class="nav-links">
+        <li class="active" data-panel="extraction">
+          <a href="#">
+            <i class="fas fa-search"></i>
+            <span>Extraction</span>
+          </a>
+        </li>
+        <li data-panel="history">
+          <a href="#">
+            <i class="fas fa-history"></i>
+            <span>History</span>
+          </a>
+        </li>
+        <li data-panel="analytics">
+          <a href="#">
+            <i class="fas fa-chart-line"></i>
+            <span>Analytics</span>
+          </a>
+        </li>
+        <li data-panel="settings">
+          <a href="#">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+          </a>
+        </li>
+      </ul>
+      
+      <div class="sidebar-footer">
+        <div class="d-flex flex-column gap-2">
+          <button id="signInBtn" class="btn btn-sm btn-outline-light w-100" data-bs-toggle="modal" data-bs-target="#signInModal">
+            <i class="fas fa-sign-in-alt me-2"></i> Sign In
+          </button>
+          <div class="d-flex gap-2">
+            <button id="adminBtn" class="btn btn-sm btn-outline-light w-100" data-bs-toggle="modal" data-bs-target="#adminModal">
+              <i class="fas fa-user-shield me-2"></i> Admin
+            </button>
+            <button id="proxyBtn" class="btn btn-sm btn-outline-light w-100" data-bs-toggle="modal" data-bs-target="#proxyModal">
+              <i class="fas fa-network-wired me-2"></i> Proxy
+            </button>
+          </div>
+          <div class="d-flex gap-2">
+            <button id="openSmsModalBtn" class="btn btn-sm btn-outline-light w-100" data-bs-toggle="modal" data-bs-target="#smsModal">
+              <i class="fas fa-sms me-2"></i> SMS
+            </button>
+            <button id="verifyBtn" class="btn btn-sm btn-outline-light w-100" data-bs-toggle="modal" data-bs-target="#verifyModal">
+              <i class="fas fa-check-circle me-2"></i> Verify
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content Area -->
+<!-- Main Content Area -->
+<main class="app-content">
+  <!-- Panel Container -->
+  <div class="panel-container">
+    <!-- Extraction Panel -->
+    <div class="content-panel active" id="extraction-panel">
+      <div class="content-header">
+        <h2><i class="fas fa-search me-2"></i>Phone Number Extraction</h2>
+        <div class="header-actions">
+          <button id="saveToNotepad" class="btn btn-success">
+            <i class="fas fa-save me-2"></i> Export Results
+          </button>
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#verifyModal">
+            <i class="fas fa-check-circle me-2"></i> Verify Numbers
+          </button>
+        </div>
+      </div>
+
+      <div class="content-body">
+        <div class="extraction-panel card">
+          <div class="card-header">
+            <h3><i class="fas fa-cog me-2"></i>Extraction Settings</h3>
+          </div>
+          <div class="card-body">
+            <form id="extractForm">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="source" class="form-label">Data Source</label>
+                  <select id="source" class="form-select" required>
+                    <option value="" disabled selected>Select source...</option>
+                    <option value="yellowpages">Yellow Pages</option>
+                    <option value="yelp">Yelp</option>
+                    <option value="personal">Personal Directories</option>
+                    <option value="custom">Custom Website</option>
+                    <option value="global">All Supported Sites</option>
+                  </select>
+                </div>
+                
+                <div class="col-md-6">
+                  <label for="searchTerm" class="form-label">Search Term</label>
+                  <input type="text" id="searchTerm" class="form-control" placeholder="e.g. Plumber, Restaurant">
+                </div>
+                
+                <div class="col-md-6">
+                  <label for="location" class="form-label">Location</label>
+                  <input type="text" id="location" class="form-control" placeholder="e.g. New York, London">
+                </div>
+                
+                <div class="col-md-6">
+                  <label for="pages" class="form-label">Pages to Scrape</label>
+                  <input type="number" id="pages" class="form-control" value="1" min="1" max="50">
+                </div>
+                
+                <div id="customUrlGroup" class="col-md-12" style="display:none;">
+                  <label for="customUrl" class="form-label">Custom Website URL</label>
+                  <input type="url" id="customUrl" class="form-control" placeholder="https://example.com">
+                </div>
+                
+                <div id="depthGroup" class="col-md-12" style="display:none;">
+                  <label for="depthPages" class="form-label">Scraping Depth</label>
+                  <div class="d-flex align-items-center gap-3">
+                    <input type="range" id="depthPages" class="form-range" value="1" min="1" max="10">
+                    <span id="depthValue" class="badge bg-primary">1 page</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="extraction-controls mt-4">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div class="form-text">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Sign in to enable extraction features
+                  </div>
+                  <div class="btn-group">
+                    <button type="submit" id="extractBtn" class="btn btn-primary" disabled>
+                      <i class="fas fa-play me-2"></i> Start
+                    </button>
+                    <button type="button" id="stopBtn" class="btn btn-outline-danger" disabled>
+                      <i class="fas fa-stop me-2"></i> Stop
+                    </button>
+                  </div>
+                </div>
+                
+                <div class="progress mt-3">
+                  <div id="extractionProgress" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%"></div>
+                </div>
+                <div class="text-end small mt-1">
+                  <span id="statusText" class="text-muted">Ready</span>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Results Panel -->
+        <div class="results-panel card mt-4">
+          <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+              <h3><i class="fas fa-list-ul me-2"></i>Extracted Numbers</h3>
+              <span id="resultCount" class="badge bg-primary">0 numbers</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle">
+                <thead>
+                  <tr>
+                    <th width="50">#</th>
+                    <th>Phone Number</th>
+                    <th>Source</th>
+                    <th>Type</th>
+                    <th>Country</th>
+                    <th>Carrier</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="resultTableBody">
+                  <tr>
+                    <td colspan="7" class="text-center py-5">
+                      <div class="empty-state">
+                        <i class="fas fa-inbox fa-3x mb-3 text-muted"></i>
+                        <h5 class="text-muted">No results yet</h5>
+                        <p class="text-muted">Start an extraction to see results here</p>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- History Panel -->
+    <div class="content-panel" id="history-panel">
+      <div class="content-header">
+        <h2><i class="fas fa-history me-2"></i>Extraction History</h2>
+        <div class="header-actions">
+          <button class="btn btn-danger">
+            <i class="fas fa-trash me-2"></i> Clear History
+          </button>
+          <button class="btn btn-secondary">
+            <i class="fas fa-download me-2"></i> Export All
+          </button>
+        </div>
+      </div>
+      <div class="content-body">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h3><i class="fas fa-clock-rotate-left me-2"></i>Recent Extractions</h3>
+            <div class="input-group" style="width: 300px;">
+              <input type="text" class="form-control" placeholder="Search history...">
+              <button class="btn btn-outline-secondary" type="button">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Source</th>
+                    <th>Search Term</th>
+                    <th>Location</th>
+                    <th>Results</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>2023-11-15 14:30</td>
+                    <td>Yellow Pages</td>
+                    <td>Plumbers</td>
+                    <td>New York</td>
+                    <td>142</td>
+                    <td>
+                      <button class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                      <button class="btn btn-sm btn-outline-success">
+                        <i class="fas fa-download"></i>
+                      </button>
+                    </td                    </tr>
+                    <!-- More history rows would be dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+            <div class="d-flex justify-content-between mt-3">
+              <div class="text-muted">Showing 1-5 of 24 extractions</div>
+              <nav>
+                <ul class="pagination">
+                  <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1">Previous</a>
+                  </li>
+                  <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                  <li class="page-item"><a class="page-link" href="#">2</a></li>
+                  <li class="page-item"><a class="page-link" href="#">3</a></li>
+                  <li class="page-item">
+                    <a class="page-link" href="#">Next</a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Analytics Panel -->
+    <div class="content-panel" id="analytics-panel">
+      <div class="content-header">
+        <h2><i class="fas fa-chart-line me-2"></i>Extraction Analytics</h2>
+        <div class="header-actions">
+          <select class="form-select" style="width: 200px;">
+            <option>Last 7 Days</option>
+            <option>Last 30 Days</option>
+            <option selected>Last 90 Days</option>
+            <option>All Time</option>
+          </select>
+        </div>
+      </div>
+      <div class="content-body">
+        <div class="row mb-4">
+          <div class="col-md-3">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Total Extractions</h5>
+                <h2 class="text-primary">1,248</h2>
+                <div class="text-success small">
+                  <i class="fas fa-arrow-up"></i> 12% from last period
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Numbers Found</h5>
+                <h2 class="text-primary">24,951</h2>
+                <div class="text-success small">
+                  <i class="fas fa-arrow-up"></i> 8% from last period
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Success Rate</h5>
+                <h2 class="text-primary">92%</h2>
+                <div class="text-danger small">
+                  <i class="fas fa-arrow-down"></i> 2% from last period
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Avg. Time</h5>
+                <h2 class="text-primary">3.2m</h2>
+                <div class="text-success small">
+                  <i class="fas fa-arrow-down"></i> 15% faster
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mb-4">
+          <div class="card-header">
+            <h3><i class="fas fa-chart-bar me-2"></i>Extractions Over Time</h3>
+          </div>
+          <div class="card-body">
+            <div class="chart-container" style="height: 300px;">
+              <!-- Chart would be rendered here with Chart.js or similar -->
+              <div class="text-center py-5">
+                <i class="fas fa-chart-bar fa-3x text-muted mb-3"></i>
+                <p class="text-muted">Extraction activity chart</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <h3><i class="fas fa-chart-pie me-2"></i>Source Distribution</h3>
+              </div>
+              <div class="card-body">
+                <div style="height: 250px;">
+                  <!-- Pie chart would go here -->
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <h3><i class="fas fa-table me-2"></i>Top Search Terms</h3>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-sm">
+                    <thead>
+                      <tr>
+                        <th>Term</th>
+                        <th>Searches</th>
+                        <th>Avg. Results</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Plumbers</td>
+                        <td>142</td>
+                        <td>87</td>
+                      </tr>
+                      <tr>
+                        <td>Restaurants</td>
+                        <td>128</td>
+                        <td>64</td>
+                      </tr>
+                      <!-- More rows would be dynamically populated -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Panel -->
+    <div class="content-panel" id="settings-panel">
+      <div class="content-header">
+        <h2><i class="fas fa-cog me-2"></i>Application Settings</h2>
+        <div class="header-actions">
+          <button class="btn btn-primary">
+            <i class="fas fa-save me-2"></i> Save Changes
+          </button>
+        </div>
+      </div>
+      <div class="content-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="card mb-4">
+                <div class="card-header">
+                  <h3><i class="fas fa-user-shield me-2"></i>Account Settings</h3>
+                </div>
+                <div class="card-body">
+                  <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <input type="text" class="form-control" value="admin">
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" value="admin@example.com">
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Change Password</label>
+                    <input type="password" class="form-control" placeholder="New password">
+                  </div>
+                </div>
+              </div>
+
+              <div class="card mb-4">
+                <div class="card-header">
+                  <h3><i class="fas fa-bell me-2"></i>Notification Settings</h3>
+                </div>
+                <div class="card-body">
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="emailNotifications" checked>
+                    <label class="form-check-label" for="emailNotifications">Email Notifications</label>
+                  </div>
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="smsNotifications">
+                    <label class="form-check-label" for="smsNotifications">SMS Notifications</label>
+                  </div>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="successAlerts" checked>
+                    <label class="form-check-label" for="successAlerts">Extraction Success Alerts</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="card mb-4">
+                <div class="card-header">
+                  <h3><i class="fas fa-sliders me-2"></i>Application Preferences</h3>
+                </div>
+                <div class="card-body">
+                  <div class="mb-3">
+                    <label class="form-label">Default Extraction Source</label>
+                    <select class="form-select">
+                      <option>Yellow Pages</option>
+                      <option selected>All Supported Sites</option>
+                      <option>Custom Website</option>
+                    </select>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Results Per Page</label>
+                    <select class="form-select">
+                      <option>10</option>
+                      <option selected>25</option>
+                      <option>50</option>
+                      <option>100</option>
+                    </select>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Theme</label>
+                    <select class="form-select">
+                      <option selected>Dark</option>
+                      <option>Light</option>
+                      <option>System Default</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <h3><i class="fas fa-shield-alt me-2"></i>Security Settings</h3>
+                </div>
+                <div class="card-body">
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="twoFactorAuth" checked>
+                    <label class="form-check-label" for="twoFactorAuth">Two-Factor Authentication</label>
+                  </div>
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="activityLogging" checked>
+                    <label class="form-check-label" for="activityLogging">Activity Logging</label>
+                  </div>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="autoLogout">
+                    <label class="form-check-label" for="autoLogout">Auto-Logout After 30 Minutes</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <!-- Modals -->
+  <!-- Sign In Modal -->
+  <div class="modal fade" id="signInModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-dark text-white">
+          <h5 class="modal-title">Sign In</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="signInForm">
+            <div class="mb-3">
+              <label class="form-label">Username</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                <input type="text" class="form-control" id="usernameInput" placeholder="Enter username" required>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Password</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                <input type="password" class="form-control" id="passwordInput" placeholder="Enter password" required>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 py-2">
+              <i class="fas fa-sign-in-alt me-2"></i> Sign In
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Modal -->
+  <div class="modal fade" id="adminModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-dark text-white">
+          <h5 class="modal-title">Admin Dashboard</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="adminLoginForm">
+            <div class="mb-4 text-center">
+              <i class="fas fa-lock fa-3x mb-3 text-dark"></i>
+              <h4>Admin Authentication</h4>
+              <p class="text-muted">Enter admin password to continue</p>
+            </div>
+            <div class="mb-3">
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-key"></i></span>
+                <input type="password" id="adminPassword" class="form-control" placeholder="Enter admin password">
+              </div>
+            </div>
+            <button class="btn btn-primary w-100 py-2" id="adminLoginBtn">
+              <i class="fas fa-unlock me-2"></i> Authenticate
+            </button>
+          </div>
+          
+          <div id="adminPanel" style="display: none;">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div>
+                <h4><i class="fas fa-user-cog me-2"></i>Credential Management</h4>
+                <p class="text-muted mb-0">Manage user access and permissions</p>
+              </div>
+              <button class="btn btn-outline-danger" id="adminLogoutBtn">
+                <i class="fas fa-sign-out-alt me-2"></i> Logout
+              </button>
+            </div>
+            
+            <div class="card mb-4">
+              <div class="card-header">
+                <h5 class="mb-0">Generate New Credentials</h5>
+              </div>
+              <div class="card-body">
+                <div class="input-group">
+                  <input type="text" id="generateUsername" class="form-control" placeholder="Custom username (optional)">
+                  <button class="btn btn-success" id="generateCredentialsBtn">
+                    <i class="fas fa-key me-2"></i> Generate
+                  </button>
+                </div>
+                <small class="text-muted">Leave username blank for random generation</small>
+              </div>
+            </div>
+            
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead class="table-light">
+                  <tr>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>Expires</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="credentialsList">
+                  <tr>
+                    <td colspan="5" class="text-center py-4 text-muted">
+                      No credentials generated yet
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Proxy Modal -->
+  <div class="modal fade" id="proxyModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-dark text-white">
+          <h5 class="modal-title"><i class="fas fa-network-wired me-2"></i>Proxy Configuration</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Proxy List</label>
+            <textarea class="form-control font-monospace" id="proxyList" rows="8" placeholder="Enter proxies (one per line):
+IP:PORT
+IP:PORT:USERNAME:PASSWORD"></textarea>
+          </div>
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            For authentication, use format: IP:PORT:USERNAME:PASSWORD
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="saveProxiesBtn">
+            <i class="fas fa-save me-2"></i> Save Proxies
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Verify Numbers Modal -->
+  <div class="modal fade" id="verifyModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-dark text-white">
+          <h5 class="modal-title"><i class="fas fa-check-circle me-2"></i>Verify Numbers</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            This will verify all extracted numbers using NumVerify API
+          </div>
+          <div class="d-grid gap-2">
+            <button id="verifyNumbersBtn" class="btn btn-primary py-2">
+              <i class="fas fa-check-circle me-2"></i> Verify Now
+            </button>
+            <button class="btn btn-outline-secondary py-2" data-bs-dismiss="modal">
+              <i class="fas fa-times me-2"></i> Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- SMS Modal -->
+<div class="modal fade" id="smsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-dark text-white">
+        <h5 class="modal-title"><i class="fas fa-sms me-2"></i>Send SMS Messages</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-info">
+          <i class="fas fa-info-circle me-2"></i>
+          Send verification SMS messages to extracted numbers
+        </div>
+        
+        <div class="mb-3">
+          <label class="form-label">Select Recipients</label>
+          <select id="smsRecipients" class="form-select">
+            <option value="selected">Selected Numbers</option>
+            <option value="all">All Extracted Numbers</option>
+            <option value="custom">Custom Numbers</option>
+          </select>
+        </div>
+        
+        <div id="customNumbersGroup" class="mb-3" style="display: none;">
+          <label class="form-label">Phone Numbers (one per line)</label>
+          <textarea id="customNumbers" class="form-control" rows="4" placeholder="+1234567890&#10;+1987654321"></textarea>
+        </div>
+        
+        <div class="mb-3">
+          <label class="form-label">Message Template</label>
+          <select id="smsTemplate" class="form-select">
+            <option value="verification">Verification Code</option>
+            <option value="custom">Custom Message</option>
+          </select>
+        </div>
+        
+        <div id="customMessageGroup" class="mb-3" style="display: none;">
+          <label class="form-label">Custom Message</label>
+          <textarea id="customMessage" class="form-control" rows="3" placeholder="Enter your custom message here"></textarea>
+        </div>
+        
+        <div id="verificationCodeGroup" class="mb-3">
+          <label class="form-label">Verification Code</label>
+          <input type="text" id="verificationCode" class="form-control" placeholder="123456" maxlength="6">
+        </div>
+        
+        <div class="d-grid gap-2 mt-4">
+          <button id="sendSmsBtn" class="btn btn-primary py-2">
+            <i class="fas fa-paper-plane me-2"></i> Send Messages
+          </button>
+          <button class="btn btn-outline-secondary py-2" data-bs-dismiss="modal">
+            <i class="fas fa-times me-2"></i> Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Number Verification Modal -->
+<div class="modal fade" id="verifyModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-dark text-white">
+        <h5 class="modal-title"><i class="fas fa-check-circle me-2"></i>Verify Phone Numbers</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-info">
+          <i class="fas fa-info-circle me-2"></i>
+          Verify extracted numbers using NumVerify API
+        </div>
+        
+        <div class="mb-3">
+          <label class="form-label">Select Numbers to Verify</label>
+          <select id="verifySelection" class="form-select">
+            <option value="selected">Selected Numbers</option>
+            <option value="all">All Extracted Numbers</option>
+            <option value="unverified">Only Unverified Numbers</option>
+          </select>
+        </div>
+        
+        <div class="table-responsive mb-3">
+          <table class="table table-sm table-hover">
+            <thead>
+              <tr>
+                <th width="40"><input type="checkbox" id="selectAllVerify" checked></th>
+                <th>Phone Number</th>
+                <th>Status</th>
+                <th>Type</th>
+                <th>Carrier</th>
+              </tr>
+            </thead>
+            <tbody id="verifyNumbersList">
+              <!-- Numbers will be populated here -->
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="d-grid gap-2">
+          <button id="verifyNumbersBtn" class="btn btn-primary py-2">
+            <i class="fas fa-check-circle me-2"></i> Verify Selected
+          </button>
+          <button class="btn btn-outline-secondary py-2" data-bs-dismiss="modal">
+            <i class="fas fa-times me-2"></i> Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- Toast Notifications -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <!-- Toasts will be dynamically inserted here -->
+  </div>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="spinner-container">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <h5 class="mt-3">Processing...</h5>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    // Improved panel switching with better structure
+document.addEventListener('DOMContentLoaded', function() {
+  // Get all nav links and panels
+  const navLinks = document.querySelectorAll('.nav-links li');
+  const panels = document.querySelectorAll('.content-panel');
+  
+  // Function to show a specific panel
+  function showPanel(panelId) {
+    // Hide all panels
+    panels.forEach(panel => {
+      panel.classList.remove('active');
+    });
+    
+    // Show the selected panel
+    const panelToShow = document.getElementById(panelId);
+    if (panelToShow) {
+      panelToShow.classList.add('active');
+    }
+  }
+  
+  // Add click event to each nav link
+  navLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      // Remove active class from all links
+      navLinks.forEach(l => l.classList.remove('active'));
+      
+      // Add active class to clicked link
+      this.classList.add('active');
+      
+      // Show the corresponding panel
+      const panelId = this.getAttribute('data-panel') + '-panel';
+      showPanel(panelId);
+    });
+  });
+  
+  // Show extraction panel by default
+  const defaultNavItem = document.querySelector('.nav-links li[data-panel="extraction"]');
+  if (defaultNavItem) {
+    defaultNavItem.classList.add('active');
+    showPanel('extraction-panel');
+  }
+});
+    // Handle Save Proxies Button
+    document.getElementById('saveProxiesBtn').addEventListener('click', function() {
+      const proxies = document.getElementById('proxyList').value.trim();
+      
+      if (!proxies) {
+        showToast('Please enter at least one proxy', 'danger');
+        return;
+      }
+
+      const proxyLines = proxies.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+      const invalidProxies = proxyLines.filter(line => !isValidProxy(line));
+
+      if (invalidProxies.length > 0) {
+        showToast(`Invalid proxy format detected`, 'danger');
+        return;
+      }
+
+      // Send proxies to server
+      socket.emit('save-proxies', proxyLines);
+      showToast(`${proxyLines.length} proxies saved successfully`, 'success');
+      
+      const proxyModal = bootstrap.Modal.getInstance(document.getElementById('proxyModal'));
+      proxyModal.hide();
+    });
+
+    // Proxy validation
+    function isValidProxy(proxy) {
+      const ipPortRegex = /^(\d{1,3}\.){3}\d{1,3}:\d{2,5}$/;
+      const ipPortAuthRegex = /^(\d{1,3}\.){3}\d{1,3}:\d{2,5}:.+:.+$/;
+      
+      if (ipPortRegex.test(proxy)) {
+        const parts = proxy.split(':');
+        const ip = parts[0];
+        const port = parseInt(parts[1], 10);
+        return isValidIP(ip) && (port >= 1 && port <= 65535);
+      } else if (ipPortAuthRegex.test(proxy)) {
+        const parts = proxy.split(':');
+        const ip = parts[0];
+        const port = parseInt(parts[1], 10);
+        return isValidIP(ip) && (port >= 1 && port <= 65535) && parts[2] && parts[3];
+      }
+      return false;
+    }
+
+    function isValidIP(ip) {
+      const segments = ip.split('.');
+      if (segments.length !== 4) return false;
+      return segments.every(seg => {
+        const n = parseInt(seg, 10);
+        return n >= 0 && n <= 255;
+      });
+    }
+
+    // Toast notification system
+    function showToast(message, type = 'success') {
+      const toastId = 'toast-' + Date.now();
+      const toastHTML = `
+        <div id="${toastId}" class="toast show align-items-center text-bg-${type}" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="d-flex">
+            <div class="toast-body">
+              <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} me-2"></i>
+              ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+        </div>
+      `;
+      
+      const container = document.querySelector('.toast-container');
+      container.insertAdjacentHTML('beforeend', toastHTML);
+      
+      setTimeout(() => {
+        const toast = document.getElementById(toastId);
+        if (toast) {
+          toast.classList.remove('show');
+          setTimeout(() => toast.remove(), 300);
+        }
+      }, 3000);
+    }
+
+    // Update depth value display
+    const depthSlider = document.getElementById('depthPages');
+    if (depthSlider) {
+      depthSlider.addEventListener('input', function() {
+        document.getElementById('depthValue').textContent = `${this.value} page${this.value > 1 ? 's' : ''}`;
+      });
+    }
+
+    // Show/hide custom URL field based on source selection
+    const sourceSelect = document.getElementById('source');
+    if (sourceSelect) {
+      sourceSelect.addEventListener('change', function() {
+        const customUrlGroup = document.getElementById('customUrlGroup');
+        const depthGroup = document.getElementById('depthGroup');
+        
+        if (this.value === 'custom') {
+          customUrlGroup.style.display = 'block';
+          depthGroup.style.display = 'block';
+        } else {
+          customUrlGroup.style.display = 'none';
+          depthGroup.style.display = 'none';
+        }
+      });
+    }
+  </script>
+  <script>
+// SMS Modal Logic
+document.getElementById('smsTemplate').addEventListener('change', function() {
+  const isCustom = this.value === 'custom';
+  document.getElementById('customMessageGroup').style.display = isCustom ? 'block' : 'none';
+  document.getElementById('verificationCodeGroup').style.display = isCustom ? 'none' : 'block';
+});
+
+document.getElementById('smsRecipients').addEventListener('change', function() {
+  document.getElementById('customNumbersGroup').style.display = this.value === 'custom' ? 'block' : 'none';
+});
+
+document.getElementById('sendSmsBtn').addEventListener('click', async function() {
+  const btn = this;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Sending...';
+  
+  try {
+    const recipients = document.getElementById('smsRecipients').value;
+    const template = document.getElementById('smsTemplate').value;
+    let numbers = [];
+    let message = '';
+    
+    // Get numbers based on selection
+    if (recipients === 'custom') {
+      const customNumbers = document.getElementById('customNumbers').value;
+      numbers = customNumbers.split('\n').filter(n => n.trim());
+    } else {
+      // Get from table (implementation depends on your table structure)
+      numbers = Array.from(document.querySelectorAll('#resultTableBody tr[data-number]'))
+        .map(row => row.getAttribute('data-number'));
+      
+      if (recipients === 'selected') {
+        numbers = numbers.filter((_, index) => 
+          document.querySelectorAll('#resultTableBody tr input[type="checkbox"]')[index]?.checked
+        );
+      }
+    }
+    
+    // Get message content
+    if (template === 'custom') {
+      message = document.getElementById('customMessage').value;
+    } else {
+      const code = document.getElementById('verificationCode').value;
+      message = `Your verification code is: ${code}`;
+    }
+    
+    if (!numbers.length) {
+      throw new Error('No phone numbers selected');
+    }
+    if (!message) {
+      throw new Error('Message cannot be empty');
+    }
+    
+    // Prepare bulk SMS data
+    const bulk = numbers.map(number => ({
+      number,
+      message
+    }));
+    
+    // Send to backend
+    const response = await fetch('/send-verification-sms', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ bulk })
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      showToast(`Successfully sent ${result.results.filter(r => r.success).length} messages`, 'success');
+      bootstrap.Modal.getInstance(document.getElementById('smsModal')).hide();
+    } else {
+      throw new Error(result.error || 'Failed to send messages');
+    }
+  } catch (error) {
+    showToast(error.message, 'danger');
+    console.error('SMS error:', error);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-paper-plane me-2"></i> Send Messages';
+  }
+});
+
+// Number Verification Modal Logic
+document.getElementById('verifyNumbersBtn').addEventListener('click', async function() {
+  const btn = this;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Verifying...';
+  
+  try {
+    const selection = document.getElementById('verifySelection').value;
+    let numbers = [];
+    
+    // Get numbers based on selection (implementation depends on your table structure)
+    if (selection === 'all') {
+      numbers = Array.from(document.querySelectorAll('#resultTableBody tr[data-number]'))
+        .map(row => row.getAttribute('data-number'));
+    } else if (selection === 'unverified') {
+      numbers = Array.from(document.querySelectorAll('#resultTableBody tr[data-number]:not([data-verified="true"])'))
+        .map(row => row.getAttribute('data-number'));
+    } else {
+      numbers = Array.from(document.querySelectorAll('#resultTableBody tr[data-number] input[type="checkbox"]:checked'))
+        .map(checkbox => checkbox.closest('tr').getAttribute('data-number'));
+    }
+    
+    if (!numbers.length) {
+      throw new Error('No phone numbers selected');
+    }
+    
+    // Send to backend
+    const response = await fetch('/verify-numbers', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ numbers })
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      // Update table with verification results
+      result.results.forEach(verification => {
+        const row = document.querySelector(`#resultTableBody tr[data-number="${verification.phone}"]`);
+        if (row) {
+          row.setAttribute('data-verified', verification.valid);
+          row.cells[5].textContent = verification.carrier || 'Unknown';
+          row.cells[6].textContent = verification.valid ? 'Valid' : 'Invalid';
+          row.cells[6].className = verification.valid ? 'text-success' : 'text-danger';
+        }
+      });
+      
+      showToast(`Verified ${result.results.length} numbers`, 'success');
+      bootstrap.Modal.getInstance(document.getElementById('verifyModal')).hide();
+    } else {
+      throw new Error(result.error || 'Failed to verify numbers');
+    }
+  } catch (error) {
+    showToast(error.message, 'danger');
+    console.error('Verification error:', error);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-check-circle me-2"></i> Verify Selected';
+  }
+});
+
+// Select all checkbox
+document.getElementById('selectAllVerify').addEventListener('change', function() {
+  document.querySelectorAll('#verifyNumbersList input[type="checkbox"]').forEach(checkbox => {
+    checkbox.checked = this.checked;
+  });
+});
+
+// Helper to populate verification modal
+function populateVerifyModal() {
+  const tbody = document.getElementById('verifyNumbersList');
+  tbody.innerHTML = '';
+  
+  // Get numbers from results table (implementation depends on your table structure)
+  const rows = document.querySelectorAll('#resultTableBody tr[data-number]');
+  
+  rows.forEach(row => {
+    const number = row.getAttribute('data-number');
+    const isVerified = row.getAttribute('data-verified') === 'true';
+    const type = row.cells[3].textContent;
+    const carrier = row.cells[5].textContent;
+    
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="checkbox" checked></td>
+      <td>${number}</td>
+      <td>${isVerified ? '<span class="badge bg-success">Verified</span>' : '<span class="badge bg-warning">Unverified</span>'}</td>
+      <td>${type}</td>
+      <td>${carrier}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// When verify modal is shown
+document.getElementById('verifyModal').addEventListener('show.bs.modal', populateVerifyModal);
+</script>
+  <!-- Bootstrap & other scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/main.js"></script>
+</body>
+</html>
