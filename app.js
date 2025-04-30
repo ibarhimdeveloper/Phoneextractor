@@ -10,6 +10,7 @@ import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import crypto from 'crypto';
 import sqlite3 from 'sqlite3';
+import { open } from 'sqlite';
 import speakeasy from 'speakeasy';
 import winston from 'winston';
 import puppeteer from 'puppeteer-extra';
@@ -18,9 +19,11 @@ import axios from 'axios';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
-
+import { MongoClient } from 'mongodb';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+
+let mongoDb;
 
 // For __dirname equivalent
 const __filename = fileURLToPath(import.meta.url);
@@ -32,13 +35,20 @@ puppeteer.use(StealthPlugin());
 // API Keys
 const BREVO_API_KEY = process.env.BREVO_API_KEY;
 const NUMVERIFY_API_KEY = process.env.NUMVERIFY_API_KEY;
+const TWO_CAPTCHA_API_KEY = process.env.TWO_CAPTCHA_API_KEY;
 
 // Initialize Express app
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+  cors: {
+    origin: process.env.NODE_ENV === 'production' 
+      ? 'https://phoneextractor.onrender.com' 
+      : 'http://localhost:3000',
+    methods: ['GET', 'POST']
+  }
+});
 
-const proxy = '';
 const MAX_PARALLEL_TABS = 20;
 const activeBrowsers = {};
 let proxyList = []; // Global array to store proxies
@@ -53,18 +63,22 @@ const args = [
   '--no-zygote'
 ];
 
-// Database setup
-const db = new sqlite3.Database('./app.db', (err) => {
-  if (err) {
-    console.error('Error opening database:', err.message);
-  } else {
-    console.log('Database connected successfully.');
-  }
+// Database connections
+const mongoClient = new MongoClient(process.env.MONGODB_URI || 'mongodb://localhost:27017/phoneextractor', {
+  serverSelectionTimeoutMS: 5000,
+  retryWrites: true,
+  retryReads: true
 });
 
-// Initialize database tables
-db.serialize(() => {
-  db.run(`CREATE TABLE IF NOT EXISTS users (
+// SQLite database setup
+let sqliteDb;
+(async () => {
+  sqliteDb = await open({
+    filename: './app.db',
+    driver: sqlite3.Database
+  });
+  
+  await sqliteDb.run(`CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT UNIQUE,
     password_hash TEXT,
@@ -75,43 +89,79 @@ db.serialize(() => {
     ip_whitelist TEXT,
     tfa_secret TEXT
   )`);
+  
+  await sqliteDb.run('CREATE INDEX IF NOT EXISTS idx_users_username ON users(username)');
+  await sqliteDb.run('CREATE INDEX IF NOT EXISTS idx_users_role ON users(role)');
+})();
 
-  db.run(`CREATE TABLE IF NOT EXISTS audit_log (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    action TEXT,
-    user_id INTEGER,
-    ip_address TEXT,
-    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-  )`);
-});
+async function connectMongoDB() {
+  try {
+    await mongoClient.connect();
+    mongoDb = mongoClient.db();
+    console.log('Connected to MongoDB');
+    
+    await mongoDb.collection('users').createIndex({ username: 1 }, { unique: true });
+    await mongoDb.collection('audit_log').createIndex({ user_id: 1 });
 
-// Close database on process exit
-process.on('exit', () => {
-  db.close((err) => {
-    if (err) {
-      console.error('Error closing database:', err.message);
-    } else {
-      console.log('Database closed.');
-    }
-  });
-});
+    const adminPassword = process.env.ADMIN_PASSWORD || 'Admin112122';
+    const hash = await bcrypt.hash(adminPassword, 12);
+    await mongoDb.collection('users').updateOne(
+      { username: 'admin' },
+      { 
+        $set: { 
+          password_hash: hash,
+          role: 'admin',
+          updated_at: new Date()
+        },
+        $setOnInsert: {
+          username: 'admin',
+          created_at: new Date(),
+          expires_at: null,
+          revoked: false,
+          ip_whitelist: null,
+          tfa_secret: null
+        }
+      },
+      { upsert: true }
+    );
 
-// Middleware setup
+  } catch (err) {
+    console.error('MongoDB init error:', err);
+  }
+}
+
+connectMongoDB();
+
+
+// Middleware
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
     ? 'https://phoneextractor.onrender.com' 
     : 'http://localhost:3000',
-  credentials: true, // <<<<< ADD COMMA HERE
+  credentials: true,
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
-
 
 app.use(bodyParser.json());
 app.use(express.static('public'));
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Logger configuration
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json()
+  ),
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({ filename: 'error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'combined.log' })
+  ]
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -138,32 +188,9 @@ const smsLimiter = rateLimit({
 app.use(limiter);
 app.post(/\/scrape-.*/, scrapeLimiter);
 
-// Logger configuration
-const logger = winston.createLogger({
-  level: 'info',
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.json()
-  ),
-  transports: [
-    new winston.transports.Console(),
-    new winston.transports.File({ filename: 'error.log', level: 'error' }),
-    new winston.transports.File({ filename: 'combined.log' })
-  ]
-});
-
-// CSRF protection setup
-const csrfTokens = new Map();
-app.use((req, res, next) => {
-  const token = crypto.randomBytes(16).toString('hex');
-  res.locals.csrfToken = token;
-  csrfTokens.set(token, Date.now() + 3600000);
-  next();
-});
-
 // JWT configuration
 const jwtConfig = {
-  secret: crypto.randomBytes(64).toString('hex'),
+  secret: process.env.JWT_SECRET || crypto.randomBytes(64).toString('hex'),
   expiresIn: '30m',
   cookieOptions: {
     httpOnly: true,
@@ -172,28 +199,14 @@ const jwtConfig = {
   }
 };
 
-// Create admin user if not exists
-const adminPassword = 'Admin112122';
-bcrypt.hash(adminPassword, 12, (err, hash) => {
-  if (err) {
-    logger.error('Error creating admin user:', err);
-    return;
-  }
-  db.run(`INSERT OR IGNORE INTO users (username, password_hash, role) 
-          VALUES (?, ?, ?)`, 
-          ['admin', hash, 'admin'],
-          (err) => {
-            if (err) logger.error('Admin creation error:', err);
-          });
-});
-
 // Socket.io events
 io.on('connection', (socket) => {
-  console.log('Client connected');
+  logger.info(`Client connected: ${socket.id}`);
 
   socket.on('save-proxies', (proxies) => {
-    proxyList = proxies;
-    console.log(`Saved ${proxies.length} proxies`);
+    proxyList = proxies.filter(proxy => isValidProxy(proxy));
+    logger.info(`Saved ${proxyList.length} valid proxies`);
+    socket.emit('proxies-saved', { count: proxyList.length });
   });
 
   socket.on('cancelScrape', async () => {
@@ -221,10 +234,24 @@ io.on('connection', (socket) => {
 });
 
 // Utility functions
-function getRandomProxy(proxies) {
-  if (!proxies || proxies.length === 0) return null;
-  const randomIndex = Math.floor(Math.random() * proxies.length);
-  return proxies[randomIndex];
+function isValidProxy(proxy) {
+  if (!proxy) return false;
+  const proxyRegex = /^(\d{1,3}\.){3}\d{1,3}:\d{1,5}(:.+:.+)?$/;
+  if (!proxyRegex.test(proxy)) return false;
+  
+  const ip = proxy.split(':')[0];
+  const ipParts = ip.split('.');
+  return ipParts.every(part => {
+    const num = parseInt(part, 10);
+    return num >= 0 && num <= 255;
+  });
+}
+
+function getRandomProxy() {
+  if (!proxyList || proxyList.length === 0) return null;
+  const validProxies = proxyList.filter(p => isValidProxy(p));
+  if (validProxies.length === 0) return null;
+  return validProxies[Math.floor(Math.random() * validProxies.length)];
 }
 
 function emitPhoneNumber(socketId, number, source) {
@@ -242,17 +269,20 @@ function reportProgress(socketId, percent) {
 
 async function startBrowser(socketId, attempt = 1) {
   try {
-    const proxy = getRandomProxy(proxyList);
+    const proxy = getRandomProxy();
     const browserArgs = [...args];
 
     if (proxy) {
       browserArgs.push(`--proxy-server=${proxy}`);
       logger.info(`Using proxy for ${socketId}: ${proxy}`);
+    } else if (proxyList.length > 0) {
+      logger.warn(`No valid proxies available, scraping directly`);
     }
 
     const browser = await puppeteer.launch({ 
       headless: true,
-      args: browserArgs
+      args: browserArgs,
+      timeout: 30000
     });
 
     activeBrowsers[socketId] = browser;
@@ -260,14 +290,12 @@ async function startBrowser(socketId, attempt = 1) {
     return browser;
     
   } catch (err) {
-    logger.error(`Browser launch failed for socket ${socketId} on attempt ${attempt}: ${err.message}`);
+    logger.error(`Browser launch failed for socket ${socket.id} on attempt ${attempt}: ${err.message}`);
     if (attempt < 5) {
-      logger.warn(`Retrying browser launch for ${socketId} (attempt ${attempt + 1})...`);
-      await new Promise((res) => setTimeout(res, 2000));
+      await new Promise(res => setTimeout(res, 2000 * attempt));
       return await startBrowser(socketId, attempt + 1);
     } else {
-      logger.error(`Failed to launch browser after 5 attempts for ${socketId}`);
-      emitError(socketId, 'Failed to start browser after multiple proxy attempts.');
+      emitError(socketId, 'Failed to start browser after multiple attempts.');
       return null;
     }
   }
@@ -300,11 +328,26 @@ function verifyAdmin(req, res, next) {
 }
 
 // Admin endpoints
-app.post('/api/admin/enable-2fa', verifyAdmin, (req, res) => {
-  const secret = speakeasy.generateSecret({ length: 20 });
-  db.run('UPDATE users SET tfa_secret = ? WHERE id = ?', 
-        [secret.base32, req.user.sub]);
-  res.json({ secret: secret.base32, qrCode: secret.otpauth_url });
+app.post('/admin-login', async (req, res) => {
+  try {
+    const ADMIN_HASH = process.env.ADMIN_HASH || 
+      '$2a$12$x8W3JUFp1lz5qj3L6VzC4.LUq7QW5R7cB7tFkQdL9JkZ1YbN2vH0a';
+    
+    const valid = await bcrypt.compare(req.body.password, ADMIN_HASH);
+    if (!valid) return res.status(401).json({ error: 'Invalid credentials' });
+
+    const token = jwt.sign(
+      { role: 'admin' },
+      jwtConfig.secret,
+      { expiresIn: jwtConfig.expiresIn }
+    );
+
+    res.cookie('adminToken', token, jwtConfig.cookieOptions);
+    res.json({ success: true });
+  } catch (err) {
+    logger.error(`Admin login error: ${err.message}`);
+    res.status(500).json({ error: 'Server error' });
+  }
 });
 
 // CAPTCHA solving
@@ -810,6 +853,28 @@ app.post('/scrape-global', async (req, res) => {
   }
 });
 
+// Replace SQLite code with MongoDB
+app.post('/login', async (req, res) => {
+  try {
+    const user = await mongoDb.collection('users').findOne({ username: req.body.username });
+    if (!user) return res.status(401).json({ error: 'Invalid credentials' });
+    
+    const valid = await bcrypt.compare(req.body.password, user.password_hash);
+    if (!valid) return res.status(401).json({ error: 'Invalid credentials' });
+    
+    const token = jwt.sign(
+      { sub: user._id, username: user.username, role: user.role },
+      jwtConfig.secret,
+      { expiresIn: jwtConfig.expiresIn }
+    );
+    
+    res.cookie('jwt', token, jwtConfig.cookieOptions);
+    res.json({ token });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 app.post('/verify-numbers', async (req, res) => {
   const { numbers = [] } = req.body;
   if (!Array.isArray(numbers) || numbers.length === 0) {
@@ -817,7 +882,7 @@ app.post('/verify-numbers', async (req, res) => {
   }
 
   const results = [];
-  const NUMVERIFY_API_KEY = '';
+  const NUMVERIFY_API_KEY = process.env.NUMVERIFY_API_KEY;
   
   for (const phone of numbers) {
     try {
