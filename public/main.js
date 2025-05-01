@@ -7,7 +7,7 @@ function getCookie(name) {
 // Admin configuration
 const CREDENTIAL_EXPIRY_DAYS = 14; // 2 weeks expiry
 
-// Replace the duplicate declarations at the top with:
+// Central DOM elements store
 const elements = {
   searchTermInput: document.getElementById('searchTerm'),
   searchTermLabel: document.querySelector('label[for="searchTerm"]'),
@@ -36,95 +36,135 @@ const elements = {
   credentialsList: document.getElementById('credentialsList'),
   proxyList: document.getElementById('proxyList'),
   saveProxiesBtn: document.getElementById('saveProxiesBtn'),
-  verifyNumbersBtn: document.getElementById('verifyNumbersBtn')
+  verifyNumbersBtn: document.getElementById('verifyNumbersBtn'),
+  adminModal: document.getElementById('adminModal'),
+  adminLoginForm: document.getElementById('adminLoginForm'),
+  adminPanel: document.getElementById('adminPanel')
 };
 
 // Credentials data store
 let credentialsData = JSON.parse(localStorage.getItem('credentials')) || {};
-
-
+updateCredentialsListUI(); // call after parsing credentials
+let isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+let storedUsername = localStorage.getItem('username') || '';
 
 // Generate New Credentials
 function generateCredentials() {
-  const username = generateUsernameInput.value.trim() || 
-    `user_${Math.random().toString(36).substring(2, 8)}`;
-  const password = generatePassword();
-  
-  // Calculate expiry date (2 weeks from now)
-  const expiresAt = new Date();
-  expiresAt.setDate(expiresAt.getDate() + CREDENTIAL_EXPIRY_DAYS);
-  
-  // Create credential object
-  const credential = {
-    username,
-    password,
-    expiresAt: expiresAt.toISOString(),
-    generatedAt: new Date().toISOString(),
-    isActive: true
-  };
-  
-  // Save to localStorage
-  credentialsData[username] = credential;
+  const username = `user${Date.now().toString().slice(-5)}`;
+  const password = Math.random().toString(36).slice(-8);
+  const createdAt = new Date().toISOString();
+
+  credentialsData[username] = { password, createdAt };
   localStorage.setItem('credentials', JSON.stringify(credentialsData));
-  
-  // Update UI
-  updateCredentialsList();
-  generateUsernameInput.value = '';
-  
-  // Show success message
-  alert(`New credentials generated!\nUsername: ${username}\nPassword: ${password}`);
+
+  updateCredentialsListUI(); // show on UI
 }
 
-// Update Credentials List in UI
-function updateCredentialsList() {
-  credentialsList.innerHTML = '';
-  
-  // Sort by expiry date (soonest first)
-  const sortedCredentials = Object.entries(credentialsData)
-    .sort((a, b) => new Date(a[1].expiresAt) - new Date(b[1].expiresAt));
-  
-  if (sortedCredentials.length === 0) {
-    credentialsList.innerHTML = `
-      <tr>
-        <td colspan="6" class="text-center py-4 text-muted">
-          No credentials generated yet
+// Update updateCredentialsList function
+async function updateCredentialsList() {
+  try {
+    const response = await fetch('/get-credentials', {
+      headers: { 'Authorization': `Bearer ${getCookie('jwt')}` }
+	  credentials: 'include'
+    });
+    const data = await response.json();
+    
+    if (!data.success) throw new Error(data.error || 'Failed to fetch credentials');
+    
+    elements.credentialsList.innerHTML = '';
+    
+    if (data.credentials.length === 0) {
+      elements.credentialsList.innerHTML = `
+        <tr>
+          <td colspan="6" class="text-center py-4 text-muted">
+            No credentials generated yet
+          </td>
+        </tr>
+      `;
+      return;
+    }
+    
+    data.credentials.forEach(cred => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${cred.username}</td>
+        <td>${cred.password || '********'}</td>
+        <td>${new Date(cred.created_at).toLocaleDateString()}</td>
+        <td>${cred.expires_at ? new Date(cred.expires_at).toLocaleDateString() : 'Never'}</td>
+        <td>${getTimeRemaining(cred.expires_at)}</td>
+        <td>
+          <button class="btn btn-sm ${cred.isActive ? 'btn-success' : 'btn-danger'}" 
+            data-action="toggle" data-username="${cred.username}">
+            ${cred.isActive ? 'Active' : 'Inactive'}
+          </button>
+          <button class="btn btn-sm btn-primary ms-1" 
+            data-action="extend" data-username="${cred.username}">
+            <i class="fas fa-plus"></i> Extend
+          </button>
         </td>
-      </tr>
-    `;
-    return;
+      `;
+      elements.credentialsList.appendChild(row);
+    });
+    
+    // Add event listeners to buttons
+    document.querySelectorAll('[data-action="toggle"]').forEach(btn => {
+      btn.addEventListener('click', () => toggleCredential(btn.dataset.username));
+    });
+    
+    document.querySelectorAll('[data-action="extend"]').forEach(btn => {
+      btn.addEventListener('click', () => extendCredential(btn.dataset.username));
+    });
+    
+  } catch (err) {
+    showToast(err.message, 'danger');
   }
-  
-  sortedCredentials.forEach(([username, cred]) => {
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${username}</td>
-      <td>${cred.password}</td>
-      <td>${new Date(cred.generatedAt).toLocaleDateString()}</td>
-      <td>${new Date(cred.expiresAt).toLocaleDateString()}</td>
-      <td>${getTimeRemaining(cred.expiresAt)}</td>
-      <td>
-        <button class="btn btn-sm ${cred.isActive ? 'btn-success' : 'btn-danger'}" 
-          data-action="toggle" data-username="${username}">
-          ${cred.isActive ? 'Active' : 'Banned'}
-        </button>
-        <button class="btn btn-sm btn-primary ms-1" 
-          data-action="extend" data-username="${username}">
-          <i class="fas fa-plus"></i> 1 Week
-        </button>
-      </td>
-    `;
-    credentialsList.appendChild(row);
-  });
-  
-  // Add event listeners to buttons
-  document.querySelectorAll('[data-action="toggle"]').forEach(btn => {
-    btn.addEventListener('click', () => toggleCredential(btn.dataset.username));
-  });
-  
-  document.querySelectorAll('[data-action="extend"]').forEach(btn => {
-    btn.addEventListener('click', () => extendCredential(btn.dataset.username));
-  });
 }
+
+// Sort by expiry date (soonest first)
+const sortedCredentials = Object.entries(credentialsData)
+  .sort((a, b) => new Date(a[1].expiresAt) - new Date(b[1].expiresAt));
+
+if (sortedCredentials.length === 0) {
+  elements.credentialsList.innerHTML = `
+    <tr>
+      <td colspan="6" class="text-center py-4 text-muted">
+        No credentials generated yet
+      </td>
+    </tr>
+  `;
+  return;
+}
+
+sortedCredentials.forEach(([username, cred]) => {
+  const row = document.createElement('tr');
+  row.innerHTML = `
+    <td>${username}</td>
+    <td>${cred.password}</td>
+    <td>${new Date(cred.generatedAt).toLocaleDateString()}</td>
+    <td>${new Date(cred.expiresAt).toLocaleDateString()}</td>
+    <td>${getTimeRemaining(cred.expiresAt)}</td>
+    <td>
+      <button class="btn btn-sm ${cred.isActive ? 'btn-success' : 'btn-danger'}" 
+        data-action="toggle" data-username="${username}">
+        ${cred.isActive ? 'Active' : 'Banned'}
+      </button>
+      <button class="btn btn-sm btn-primary ms-1" 
+        data-action="extend" data-username="${username}">
+        <i class="fas fa-plus"></i> 1 Week
+      </button>
+    </td>
+  `;
+  elements.credentialsList.appendChild(row);
+});
+
+// Add event listeners to buttons
+document.querySelectorAll('[data-action="toggle"]').forEach(btn => {
+  btn.addEventListener('click', () => toggleCredential(btn.dataset.username));
+});
+
+document.querySelectorAll('[data-action="extend"]').forEach(btn => {
+  btn.addEventListener('click', () => extendCredential(btn.dataset.username));
+});
 
 // Toggle credential active status
 function toggleCredential(username) {
@@ -187,9 +227,9 @@ function startCredentialsTimer() {
 
 // Admin logout
 function handleAdminLogout() {
-  adminLoginForm.style.display = 'block';
-  adminPanel.style.display = 'none';
-  adminPasswordInput.value = '';
+  elements.adminLoginForm.style.display = 'block';
+  elements.adminPanel.style.display = 'none';
+  elements.adminPasswordInput.value = '';
   
   // Clear refresh interval
   if (window.credentialsRefreshInterval) {
@@ -198,9 +238,9 @@ function handleAdminLogout() {
 }
 
 // Event Listeners
-adminLoginBtn.addEventListener('click', handleAdminLogin);
-adminLogoutBtn.addEventListener('click', handleAdminLogout);
-generateCredentialsBtn.addEventListener('click', generateCredentials);
+elements.adminLoginBtn.addEventListener('click', handleAdminLogin);
+elements.adminLogoutBtn.addEventListener('click', handleAdminLogout);
+elements.generateCredentialsBtn.addEventListener('click', generateCredentials);
 
 // User authentication
 function validateUserCredentials(username, password) {
@@ -218,11 +258,11 @@ function validateUserCredentials(username, password) {
 }
 
 // Initialize admin panel
-if (adminModal) {
-  adminModal.addEventListener('show.bs.modal', () => {
-    adminLoginForm.style.display = 'block';
-    adminPanel.style.display = 'none';
-    adminPasswordInput.value = '';
+if (elements.adminModal) {
+  elements.adminModal.addEventListener('show.bs.modal', () => {
+    elements.adminLoginForm.style.display = 'block';
+    elements.adminPanel.style.display = 'none';
+    elements.adminPasswordInput.value = '';
   });
 }
 
@@ -298,28 +338,13 @@ const apiMap = {
 // Initialize UI
 updateUI();
 if (isAuthenticated) {
-  signInBtn.textContent = `Sign Out (${storedUsername})`;
+  elements.signInBtn.textContent = `Sign Out (${storedUsername})`;
 }
-
-// Event Listeners
-const {
-  form,
-  sourceSelect,
-  stopBtn,
-  saveBtn,
-  signInBtn,
-  adminBtn,
-  adminLoginBtn,
-  adminLogoutBtn,
-  generateCredentialsBtn,
-  signInForm,
-  verifyNumbersBtn
-} = elements;
 
 // Initialize form visibility and depth slider
 handleFormVisibility();
-if (depthInput) {
-  depthInput.addEventListener('input', updateDepthValue);
+if (elements.depthInput) {
+  elements.depthInput.addEventListener('input', updateDepthValue);
   updateDepthValue();
 }
 
@@ -521,12 +546,14 @@ function saveNumbers() {
 
 function handleSignIn() {
   if (isAuthenticated) {
+    // Sign out logic
     isAuthenticated = false;
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('username');
-    if (signInBtn) signInBtn.textContent = 'Sign In';
+    document.cookie = 'jwt=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    elements.signInBtn.textContent = 'Sign In';
     updateUI();
-    alert('Signed out!');
+    showToast('Signed out successfully', 'success');
   } else {
     new bootstrap.Modal(document.getElementById('signInModal')).show();
   }
@@ -544,6 +571,7 @@ async function verifyNumbers() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ numbers })
+	  credentials: 'include'
     });
 
     const data = await res.json();
@@ -572,18 +600,18 @@ async function verifyNumbers() {
 
 // Admin Login Functionality
 async function handleAdminLogin() {
-  const response = await fetch('/admin-login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ password: elements.adminPasswordInput.value })
-  });
-  
-  if (response.ok) {
-    document.cookie = `adminToken=${await response.json().token}; path=/; Secure`;
+  try {
+    const response = await fetch('/admin-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: elements.adminPasswordInput.value })
+	  credentials: 'include'
+    });
 
     const data = await response.json();
-    
-    if (data.success) {
+
+    if (response.ok && data.success) {
+      document.cookie = `jwt=${data.token}; path=/; ${process.env.NODE_ENV === 'production' ? 'Secure; SameSite=Strict' : ''}`;
       document.getElementById('adminLoginForm').style.display = 'none';
       document.getElementById('adminPanel').style.display = 'block';
       updateCredentialsList();
@@ -597,6 +625,7 @@ async function handleAdminLogin() {
     showToast('Login failed. Please try again.', 'danger');
   }
 }
+
 
 function handleAdminLogout() {
   document.getElementById('adminLoginForm').style.display = 'block';
@@ -673,21 +702,37 @@ function generatePassword() {
   return password;
 }
 
-function handleUserLogin(e) {
+async function handleUserLogin(e) {
   e.preventDefault();
-  const username = usernameInput.value.trim();
-  const password = passwordInput.value;
-  
-  if (validateUserCredentials(username, password)) {
-    isAuthenticated = true;
-    localStorage.setItem('isAuthenticated', 'true');
-    localStorage.setItem('username', username);
-    if (signInBtn) signInBtn.textContent = `Sign Out (${username})`;
-    updateUI();
-    bootstrap.Modal.getInstance(document.getElementById('signInModal')).hide();
-    alert('Signed in successfully!');
-  } else {
-    alert('Invalid credentials or credentials expired');
+  const username = elements.usernameInput.value.trim();
+  const password = elements.passwordInput.value;
+
+  try {
+    const response = await fetch('/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+	  credentials: 'include'
+    });
+
+    const data = await response.json();
+    
+    if (data.success) {
+      isAuthenticated = true;
+      storedUsername = username;
+      localStorage.setItem('isAuthenticated', 'true');
+      localStorage.setItem('username', username);
+      
+      elements.signInBtn.textContent = `Sign Out (${username})`;
+      updateUI();
+      
+      bootstrap.Modal.getInstance(document.getElementById('signInModal')).hide();
+      showToast('Signed in successfully!', 'success');
+    } else {
+      throw new Error(data.error || 'Invalid credentials');
+    }
+  } catch (err) {
+    showToast(err.message, 'danger');
   }
 }
 
@@ -729,26 +774,15 @@ if (saveProxiesBtn) {
 
 function isValidProxy(proxy) {
   const proxyRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?):\d{1,5}(?::[^:]+:[^:]+)?$/;
-  return proxyRegex.test(proxy) && 
-         !proxy.includes('127.0.0.1') && 
-         !proxy.includes('localhost');
-}
   
-  // Validate IP segments
+  if (!proxyRegex.test(proxy)) return false;
+  if (proxy.includes('127.0.0.1') || proxy.includes('localhost')) return false;
+
   const ip = proxy.split(':')[0];
   const ipParts = ip.split('.');
   return ipParts.every(part => {
     const num = parseInt(part, 10);
     return num >= 0 && num <= 255;
-  });
-}
-
-function isValidIP(ip) {
-  const segments = ip.split('.');
-  if (segments.length !== 4) return false;
-  return segments.every(seg => {
-    const n = parseInt(seg, 10);
-    return n >= 0 && n <= 255;
   });
 }
 
@@ -777,4 +811,48 @@ function showToast(message, type = 'success') {
       setTimeout(() => toast.remove(), 300);
     }
   }, 3000);
+}
+
+async function toggleCredential(username) {
+  try {
+    const response = await fetch('/toggle-credential', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getCookie('jwt')}`
+      },
+      body: JSON.stringify({ username, revoke: true }) // Toggle logic needs to check current state
+	  credentials: 'include'
+    });
+    
+    const data = await response.json();
+    if (!data.success) throw new Error(data.error || 'Failed to toggle credential');
+    
+    showToast(`Credential ${username} updated`, 'success');
+    updateCredentialsList();
+  } catch (err) {
+    showToast(err.message, 'danger');
+  }
+}
+
+async function extendCredential(username) {
+  try {
+    const response = await fetch('/extend-credential', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getCookie('jwt')}`
+      },
+      body: JSON.stringify({ username, days: 7 })
+	  credentials: 'include'
+    });
+    
+    const data = await response.json();
+    if (!data.success) throw new Error(data.error || 'Failed to extend credential');
+    
+    showToast(`Credential ${username} extended by 7 days`, 'success');
+    updateCredentialsList();
+  } catch (err) {
+    showToast(err.message, 'danger');
+  }
 }

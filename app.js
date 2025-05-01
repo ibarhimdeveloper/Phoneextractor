@@ -22,6 +22,8 @@ import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import { MongoClient } from 'mongodb';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import cookieParser from 'cookie-parser';
+
 
 let mongoDb;
 
@@ -64,7 +66,7 @@ const args = [
 ];
 
 // Database connections
-const mongoClient = new MongoClient(process.env.MONGODB_URI || 'mongodb://localhost:27017/phoneextractor', {
+const mongoClient = new MongoClient(process.env.MONGODB_URI, {
   serverSelectionTimeoutMS: 5000,
   retryWrites: true,
   retryReads: true
@@ -78,17 +80,20 @@ let sqliteDb;
     driver: sqlite3.Database
   });
   
-  await sqliteDb.run(`CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT UNIQUE,
-    password_hash TEXT,
-    role TEXT DEFAULT 'user',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    expires_at DATETIME,
-    revoked BOOLEAN DEFAULT 0,
-    ip_whitelist TEXT,
-    tfa_secret TEXT
-  )`);
+  await sqliteDb.run(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT UNIQUE,
+      password_hash TEXT,
+      role TEXT DEFAULT 'user',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      expires_at DATETIME,
+      revoked BOOLEAN DEFAULT 0,
+      ip_whitelist TEXT,
+      tfa_secret TEXT
+    )
+  `);
+
   
   await sqliteDb.run('CREATE INDEX IF NOT EXISTS idx_users_username ON users(username)');
   await sqliteDb.run('CREATE INDEX IF NOT EXISTS idx_users_role ON users(role)');
@@ -98,13 +103,11 @@ async function connectMongoDB() {
   try {
     await mongoClient.connect();
     mongoDb = mongoClient.db();
-    console.log('Connected to MongoDB');
     
-    await mongoDb.collection('users').createIndex({ username: 1 }, { unique: true });
-    await mongoDb.collection('audit_log').createIndex({ user_id: 1 });
-
+    // Force admin user creation
     const adminPassword = process.env.ADMIN_PASSWORD || 'Admin112122';
     const hash = await bcrypt.hash(adminPassword, 12);
+    
     await mongoDb.collection('users').updateOne(
       { username: 'admin' },
       { 
@@ -124,7 +127,6 @@ async function connectMongoDB() {
       },
       { upsert: true }
     );
-
   } catch (err) {
     console.error('MongoDB init error:', err);
   }
@@ -134,6 +136,7 @@ connectMongoDB();
 
 
 // Middleware
+app.use(cookieParser());
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
     ? 'https://phoneextractor.onrender.com' 
@@ -314,9 +317,50 @@ function extractPhoneNumbers(text) {
   }).filter(Boolean);
 }
 
-// Authentication middleware
+// Update the /admin-login endpoint
+app.post('/admin-login', async (req, res) => {
+  try {
+    const { password } = req.body;
+    
+    // Fetch admin user from MongoDB
+    const adminUser = await mongoDb.collection('users').findOne({ 
+      username: 'admin', 
+      role: 'admin' 
+    });
+    
+    if (!adminUser) {
+      return res.status(401).json({ error: 'Admin account not found' });
+    }
+
+    // Compare passwords
+    const valid = await bcrypt.compare(password, adminUser.password_hash);
+    if (!valid) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // Generate JWT
+    const token = jwt.sign(
+      { sub: adminUser._id, username: adminUser.username, role: adminUser.role },
+      jwtConfig.secret,
+      { expiresIn: jwtConfig.expiresIn }
+    );
+
+    // Set cookie with correct name
+    res.cookie('jwt', token, jwtConfig.cookieOptions);
+    res.json({ success: true });
+  } catch (err) {
+    logger.error(`Admin login error: ${err.message}`);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Verify Admin Middleware
 function verifyAdmin(req, res, next) {
-  const token = req.cookies.jwt;
+  const token = req.cookies.jwt; // Consistent cookie name
+  if (!token) {
+    return res.status(403).json({ error: 'Admin access required' });
+  }
+
   try {
     const decoded = jwt.verify(token, jwtConfig.secret);
     if (decoded.role !== 'admin') throw new Error();
@@ -326,29 +370,6 @@ function verifyAdmin(req, res, next) {
     res.status(403).json({ error: 'Admin access required' });
   }
 }
-
-// Admin endpoints
-app.post('/admin-login', async (req, res) => {
-  try {
-    const ADMIN_HASH = process.env.ADMIN_HASH || 
-      '$2a$12$x8W3JUFp1lz5qj3L6VzC4.LUq7QW5R7cB7tFkQdL9JkZ1YbN2vH0a';
-    
-    const valid = await bcrypt.compare(req.body.password, ADMIN_HASH);
-    if (!valid) return res.status(401).json({ error: 'Invalid credentials' });
-
-    const token = jwt.sign(
-      { role: 'admin' },
-      jwtConfig.secret,
-      { expiresIn: jwtConfig.expiresIn }
-    );
-
-    res.cookie('adminToken', token, jwtConfig.cookieOptions);
-    res.json({ success: true });
-  } catch (err) {
-    logger.error(`Admin login error: ${err.message}`);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
 
 // CAPTCHA solving
 async function solveCaptcha(page) {
@@ -856,21 +877,40 @@ app.post('/scrape-global', async (req, res) => {
 // Replace SQLite code with MongoDB
 app.post('/login', async (req, res) => {
   try {
-    const user = await mongoDb.collection('users').findOne({ username: req.body.username });
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res.status(400).json({ error: 'Username and password required' });
+    }
+
+    const user = await mongoDb.collection('users').findOne({ username });
     if (!user) return res.status(401).json({ error: 'Invalid credentials' });
     
-    const valid = await bcrypt.compare(req.body.password, user.password_hash);
+    // Check if account is active and not expired
+    if (user.revoked || (user.expires_at && new Date(user.expires_at) < new Date())) {
+      return res.status(401).json({ error: 'Account expired or revoked' });
+    }
+
+    const valid = await bcrypt.compare(password, user.password_hash);
     if (!valid) return res.status(401).json({ error: 'Invalid credentials' });
     
     const token = jwt.sign(
-      { sub: user._id, username: user.username, role: user.role },
+      { 
+        sub: user._id, 
+        username: user.username, 
+        role: user.role 
+      },
       jwtConfig.secret,
       { expiresIn: jwtConfig.expiresIn }
     );
     
     res.cookie('jwt', token, jwtConfig.cookieOptions);
-    res.json({ token });
+    res.json({ 
+      success: true,
+      username: user.username,
+      expiresAt: user.expires_at
+    });
   } catch (err) {
+    logger.error('Login error:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -1257,6 +1297,93 @@ app.post('/send-verification-sms', smsLimiter, async (req, res) => {
   } catch (err) {
     logger.error(`SMS error: ${err.message}`);
     res.status(500).json({ success: false, error: 'Failed to send SMS' });
+  }
+});
+
+app.post('/generate-credentials', verifyAdmin, async (req, res) => {
+  try {
+    const { username } = req.body;
+    const generatedUsername = username || 'user' + crypto.randomBytes(3).toString('hex');
+    const generatedPassword = crypto.randomBytes(6).toString('base64').slice(0, 10);
+    const passwordHash = await bcrypt.hash(generatedPassword, 12);
+    
+    // Set expiry date (e.g., 14 days from now)
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 14);
+
+    await mongoDb.collection('users').insertOne({
+      username: generatedUsername,
+      password_hash: passwordHash,
+      role: 'user',
+      created_at: new Date(),
+      expires_at: expiresAt,
+      revoked: false,
+      isActive: true
+    });
+
+    res.json({ 
+      success: true, 
+      username: generatedUsername, 
+      password: generatedPassword,
+      expiresAt: expiresAt.toISOString()
+    });
+  } catch (err) {
+    logger.error('Credential Generation Error:', err);
+    res.status(500).json({ success: false, error: 'Server error' });
+  }
+});
+
+app.get('/get-credentials', verifyAdmin, async (req, res) => {
+  try {
+    const users = await mongoDb.collection('users')
+      .find({ role: 'user' })
+      .sort({ created_at: -1 })
+      .toArray();
+      
+    // Don't send password hashes to client
+    const credentials = users.map(user => ({
+      username: user.username,
+      created_at: user.created_at,
+      expires_at: user.expires_at,
+      isActive: !user.revoked && (!user.expires_at || new Date(user.expires_at) > new Date())
+    }));
+    
+    res.json({ success: true, credentials });
+  } catch (err) {
+    logger.error('Get credentials error:', err);
+    res.status(500).json({ success: false, error: 'Server error' });
+  }
+});
+
+app.post('/toggle-credential', verifyAdmin, async (req, res) => {
+  try {
+    const { username } = req.body;
+    await mongoDb.collection('users').updateOne(
+      { username },
+      { $set: { revoked: req.body.revoke } }
+    );
+    res.json({ success: true });
+  } catch (err) {
+    logger.error('Toggle credential error:', err);
+    res.status(500).json({ success: false, error: 'Server error' });
+  }
+});
+
+app.post('/extend-credential', verifyAdmin, async (req, res) => {
+  try {
+    const { username, days = 7 } = req.body;
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + parseInt(days));
+    
+    await mongoDb.collection('users').updateOne(
+      { username },
+      { $set: { expires_at: expiresAt } }
+    );
+    
+    res.json({ success: true, expiresAt });
+  } catch (err) {
+    logger.error('Extend credential error:', err);
+    res.status(500).json({ success: false, error: 'Server error' });
   }
 });
 
