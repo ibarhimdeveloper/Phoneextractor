@@ -111,17 +111,17 @@
                   </select>
                 </div>
                 
-                <div class="col-md-6">
-                  <label for="searchTerm" class="form-label">Search Term</label>
+                <div id="searchTermGroup" class="col-md-6">
+                  <label id="searchTermLabel" for="searchTerm" class="form-label">Search Term</label>
                   <input type="text" id="searchTerm" class="form-control" placeholder="e.g. Plumber, Restaurant">
                 </div>
-                
-                <div class="col-md-6">
+
+                <div id="locationGroup" class="col-md-6">
                   <label for="location" class="form-label">Location</label>
                   <input type="text" id="location" class="form-control" placeholder="e.g. New York, London">
                 </div>
-                
-                <div class="col-md-6">
+
+                <div id="pagesGroup" class="col-md-6">
                   <label for="pages" class="form-label">Pages to Scrape</label>
                   <input type="number" id="pages" class="form-control" value="1" min="1" max="50">
                 </div>
@@ -132,7 +132,7 @@
                 </div>
                 
                 <div id="depthGroup" class="col-md-12" style="display:none;">
-                  <label for="depthPages" class="form-label">Scraping Depth</label>
+                  <label for="depthGroup" class="form-label">Scraping Depth</label>
                   <div class="d-flex align-items-center gap-3">
                     <input type="range" id="depthPages" class="form-range" value="1" min="1" max="10">
                     <span id="depthValue" class="badge bg-primary">1 page</span>
@@ -1121,20 +1121,31 @@ document.getElementById('adminLoginBtn').addEventListener('click', async () => {
 document.getElementById('generateCredentialsBtn').addEventListener('click', async () => {
   const username = document.getElementById('generateUsername').value;
 
-  const response = await fetch('/generate-credentials', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username })
-  });
+  try {
+    const response = await fetch('/generate-credentials', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username })
+    });
 
-  const data = await response.json();
-  if (data.success) {
-    // Optionally update the UI with new credentials
-    alert(`Generated:\nUsername: ${data.username}\nPassword: ${data.password}`);
-  } else {
-    alert('Error generating credentials');
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Server error:', errorText);
+      return alert('Server error while generating credentials.');
+    }
+
+    const data = await response.json();
+    if (data.success) {
+      alert(`Generated:\nUsername: ${data.username}\nPassword: ${data.password}`);
+    } else {
+      alert('Error generating credentials');
+    }
+  } catch (err) {
+    console.error('Request failed:', err);
+    alert('Failed to connect to server or parse response.');
   }
 });
+
 
 // Helper to populate verification modal
 function populateVerifyModal() {
@@ -1169,5 +1180,25 @@ document.getElementById('verifyModal').addEventListener('show.bs.modal', populat
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
   <script src="/main.js"></script>
+  <script>
+  // Initialize auth state
+  document.addEventListener('DOMContentLoaded', async () => {
+    try {
+      const response = await fetch('/check-auth', {
+        credentials: 'include'
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          const signInBtn = document.getElementById('signInBtn');
+          signInBtn.innerHTML = `<i class="fas fa-sign-out-alt me-2"></i> Sign Out (${data.user.username})`;
+        }
+      }
+    } catch (err) {
+      console.error('Initial auth check failed:', err);
+    }
+  });
+</script>
 </body>
 </html>

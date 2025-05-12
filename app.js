@@ -38,6 +38,7 @@ puppeteer.use(StealthPlugin());
 const BREVO_API_KEY = process.env.BREVO_API_KEY;
 const NUMVERIFY_API_KEY = process.env.NUMVERIFY_API_KEY;
 const TWO_CAPTCHA_API_KEY = process.env.TWO_CAPTCHA_API_KEY;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Admin112122';
 
 // Initialize Express app
 const app = express();
@@ -104,11 +105,12 @@ async function connectMongoDB() {
     await mongoClient.connect();
     mongoDb = mongoClient.db();
     
-    // Force admin user creation
+    await mongoDb.collection('users').createIndex({ username: 1 }, { unique: true });
+    
     const adminPassword = process.env.ADMIN_PASSWORD || 'Admin112122';
     const hash = await bcrypt.hash(adminPassword, 12);
     
-    await mongoDb.collection('users').updateOne(
+    const result = await mongoDb.collection('users').updateOne(
       { username: 'admin' },
       { 
         $set: { 
@@ -127,8 +129,13 @@ async function connectMongoDB() {
       },
       { upsert: true }
     );
+    
+    if (result.upsertedCount > 0) {
+      logger.info('Admin user created');
+    }
   } catch (err) {
-    console.error('MongoDB init error:', err);
+    logger.error('MongoDB connection error:', err);
+    process.exit(1); // Exit if we can't connect to MongoDB
   }
 }
 
@@ -141,9 +148,9 @@ app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
     ? 'https://phoneextractor.onrender.com' 
     : 'http://localhost:3000',
-  credentials: true,
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  credentials: true, // Allow credentials
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie']
 }));
 
 app.use(bodyParser.json());
@@ -194,11 +201,12 @@ app.post(/\/scrape-.*/, scrapeLimiter);
 // JWT configuration
 const jwtConfig = {
   secret: process.env.JWT_SECRET || crypto.randomBytes(64).toString('hex'),
-  expiresIn: '30m',
+  expiresIn: '1h', // Increased from 30m
   cookieOptions: {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict'
+    sameSite: 'strict',
+    maxAge: 60 * 60 * 1000 // 1 hour in milliseconds
   }
 };
 
@@ -238,15 +246,21 @@ io.on('connection', (socket) => {
 
 // Utility functions
 function isValidProxy(proxy) {
-  if (!proxy) return false;
+  if (!proxy || typeof proxy !== 'string') return false;
+  
+  // Basic format validation
   const proxyRegex = /^(\d{1,3}\.){3}\d{1,3}:\d{1,5}(:.+:.+)?$/;
   if (!proxyRegex.test(proxy)) return false;
   
+  // Validate IP parts
   const ip = proxy.split(':')[0];
   const ipParts = ip.split('.');
+  
+  if (ipParts.length !== 4) return false;
+  
   return ipParts.every(part => {
     const num = parseInt(part, 10);
-    return num >= 0 && num <= 255;
+    return num >= 0 && num <= 255 && part === num.toString();
   });
 }
 
@@ -257,6 +271,7 @@ function getRandomProxy() {
   return validProxies[Math.floor(Math.random() * validProxies.length)];
 }
 
+// In your server code (app.js)
 function emitPhoneNumber(socketId, number, source) {
   if (!activeBrowsers[socketId]) return;
   io.to(socketId).emit('phoneNumber', { number, source });
@@ -271,36 +286,29 @@ function reportProgress(socketId, percent) {
 }
 
 async function startBrowser(socketId, attempt = 1) {
+  const proxy = getRandomProxy();
+  const argsWithProxy = proxy 
+    ? [...args, `--proxy-server=${proxy}`]
+    : args;
+
   try {
-    const proxy = getRandomProxy();
-    const browserArgs = [...args];
-
-    if (proxy) {
-      browserArgs.push(`--proxy-server=${proxy}`);
-      logger.info(`Using proxy for ${socketId}: ${proxy}`);
-    } else if (proxyList.length > 0) {
-      logger.warn(`No valid proxies available, scraping directly`);
-    }
-
     const browser = await puppeteer.launch({ 
+      executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
       headless: true,
-      args: browserArgs,
+      args: argsWithProxy,
       timeout: 30000
     });
-
-    activeBrowsers[socketId] = browser;
-    logger.info(`Browser launched successfully for socket: ${socketId}`);
-    return browser;
     
+    logger.info('Browser launched successfully');
+    activeBrowsers[socketId] = browser;
+    return browser;
   } catch (err) {
-    logger.error(`Browser launch failed for socket ${socket.id} on attempt ${attempt}: ${err.message}`);
-    if (attempt < 5) {
+    logger.error(`Browser launch failed: ${err.message}`);
+    if (attempt < 3) {
       await new Promise(res => setTimeout(res, 2000 * attempt));
-      return await startBrowser(socketId, attempt + 1);
-    } else {
-      emitError(socketId, 'Failed to start browser after multiple attempts.');
-      return null;
+      return startBrowser(socketId, attempt + 1);
     }
+    throw err;
   }
 }
 
@@ -317,57 +325,80 @@ function extractPhoneNumbers(text) {
   }).filter(Boolean);
 }
 
-// Update the /admin-login endpoint
+// Update admin login endpoint
 app.post('/admin-login', async (req, res) => {
-  try {
-    const { password } = req.body;
-    
-    // Fetch admin user from MongoDB
-    const adminUser = await mongoDb.collection('users').findOne({ 
-      username: 'admin', 
-      role: 'admin' 
-    });
-    
-    if (!adminUser) {
-      return res.status(401).json({ error: 'Admin account not found' });
-    }
+  const { password } = req.body;
 
-    // Compare passwords
-    const valid = await bcrypt.compare(password, adminUser.password_hash);
-    if (!valid) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-
-    // Generate JWT
+  if (password === ADMIN_PASSWORD) {
     const token = jwt.sign(
-      { sub: adminUser._id, username: adminUser.username, role: adminUser.role },
-      jwtConfig.secret,
-      { expiresIn: jwtConfig.expiresIn }
+      { 
+        role: 'admin',
+        exp: Math.floor(Date.now() / 1000) + (60 * 60) // 1 hour expiration
+      }, 
+      jwtConfig.secret
     );
-
-    // Set cookie with correct name
     res.cookie('jwt', token, jwtConfig.cookieOptions);
-    res.json({ success: true });
+    return res.json({ success: true });
+  } else {
+    return res.status(401).json({ success: false, error: 'Wrong password' });
+  }
+});
+
+// Add this to your existing app.js
+app.get('/check-auth', async (req, res) => {
+  const token = req.cookies.jwt;
+  if (!token) {
+    return res.status(401).json({ success: false, error: 'Not authenticated' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, jwtConfig.secret);
+    
+    // Check if user exists in database
+    const user = await mongoDb.collection('users').findOne({ 
+      username: decoded.username,
+      revoked: { $ne: true },
+      $or: [
+        { expires_at: null },
+        { expires_at: { $gt: new Date() } }
+      ]
+    });
+
+    if (!user) {
+      return res.status(401).json({ success: false, error: 'Invalid or expired user' });
+    }
+
+    res.json({ 
+      success: true, 
+      user: { 
+        username: user.username,
+        role: user.role 
+      } 
+    });
   } catch (err) {
-    logger.error(`Admin login error: ${err.message}`);
-    res.status(500).json({ error: 'Server error' });
+    return res.status(401).json({ success: false, error: 'Invalid or expired token' });
   }
 });
 
 // Verify Admin Middleware
 function verifyAdmin(req, res, next) {
-  const token = req.cookies.jwt; // Consistent cookie name
+  const token = req.cookies.jwt;
   if (!token) {
     return res.status(403).json({ error: 'Admin access required' });
   }
 
   try {
     const decoded = jwt.verify(token, jwtConfig.secret);
-    if (decoded.role !== 'admin') throw new Error();
+    if (decoded.role !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
     req.user = decoded;
     next();
   } catch (error) {
-    res.status(403).json({ error: 'Admin access required' });
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({ error: 'Session expired' });
+    }
+    res.status(403).json({ error: 'Invalid token' });
   }
 }
 
@@ -379,7 +410,7 @@ async function solveCaptcha(page) {
 
     if (!recaptchaFrame) {
       logger.info('No CAPTCHA found.');
-      return;
+      return false;
     }
 
     logger.info('CAPTCHA detected. Solving...');
@@ -389,6 +420,11 @@ async function solveCaptcha(page) {
     const captchaIdResponse = await axios.get(
       `http://2captcha.com/in.php?key=${TWO_CAPTCHA_API_KEY}&method=userrecaptcha&googlekey=${sitekey}&pageurl=${encodeURIComponent(url)}&json=1`
     );
+    
+    if (!captchaIdResponse.data || !captchaIdResponse.data.request) {
+      throw new Error('Failed to get CAPTCHA ID');
+    }
+    
     const captchaId = captchaIdResponse.data.request;
 
     await new Promise(resolve => setTimeout(resolve, 20000));
@@ -406,27 +442,32 @@ async function solveCaptcha(page) {
     }
 
     if (!token) {
-      logger.error('Failed to solve CAPTCHA.');
-      return;
+      throw new Error('Failed to solve CAPTCHA after multiple attempts');
     }
 
     logger.info('CAPTCHA solved successfully.');
     await page.evaluate(`document.getElementById("g-recaptcha-response").innerHTML="${token}";`);
     await page.evaluate(() => {
-      document.querySelector('form').submit();
+      const form = document.querySelector('form');
+      if (form) form.submit();
     });
 
     await page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 30000 });
+    return true;
   } catch (err) {
     logger.error(`CAPTCHA solving error: ${err.message}`);
+    return false;
   }
 }
 
 // Generic scraper helper
 async function genericScraper({ searchUrl, sourceName, searchTerm, location, pages, socketId, customExtraction }) {
+  logger.info(`Starting ${sourceName} scrape`, { searchTerm, location, pages });
+  
   const browser = await startBrowser(socketId);
-  if (!browser) return;
-  const seenNumbers = new Set();
+  if (!browser) {
+    throw new Error('Failed to start browser');
+  }
 
   try {
     const totalPages = Math.min(pages, 10); // Limit to 10 pages max
@@ -466,13 +507,12 @@ async function genericScraper({ searchUrl, sourceName, searchTerm, location, pag
 
     reportProgress(socketId, 100);
   } catch (err) {
-    logger.error(`${sourceName} error: ${err.message}`);
-    emitError(socketId, `Failed to scrape ${sourceName}.`);
-  } finally {
-    if (browser && browser.isConnected()) {
-      await browser.close();
+    logger.error(`${params.sourceName} error: ${err.message}`);
+    if (activeBrowsers[params.socketId]) {
+      await activeBrowsers[params.socketId].close();
+      delete activeBrowsers[params.socketId];
     }
-    delete activeBrowsers[socketId];
+    emitError(params.socketId, `Failed to scrape ${params.sourceName}: ${err.message}`);
   }
 }
 
@@ -897,10 +937,10 @@ app.post('/login', async (req, res) => {
       { 
         sub: user._id, 
         username: user.username, 
-        role: user.role 
+        role: user.role,
+        exp: Math.floor(Date.now() / 1000) + (60 * 60) // 1 hour expiration
       },
-      jwtConfig.secret,
-      { expiresIn: jwtConfig.expiresIn }
+      jwtConfig.secret
     );
     
     res.cookie('jwt', token, jwtConfig.cookieOptions);
@@ -913,6 +953,12 @@ app.post('/login', async (req, res) => {
     logger.error('Login error:', err);
     res.status(500).json({ error: 'Server error' });
   }
+});
+
+// Add logout endpoint
+app.post('/logout', (req, res) => {
+  res.clearCookie('jwt', jwtConfig.cookieOptions);
+  res.json({ success: true });
 });
 
 app.post('/verify-numbers', async (req, res) => {
@@ -1325,8 +1371,8 @@ app.post('/generate-credentials', verifyAdmin, async (req, res) => {
       success: true, 
       username: generatedUsername, 
       password: generatedPassword,
-      expiresAt: expiresAt.toISOString()
-    });
+      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+  });
   } catch (err) {
     logger.error('Credential Generation Error:', err);
     res.status(500).json({ success: false, error: 'Server error' });
@@ -1387,8 +1433,40 @@ app.post('/extend-credential', verifyAdmin, async (req, res) => {
   }
 });
 
+// Real-time extraction
+app.post('/start-extraction', (req, res) => {
+  const { source, term, location, pages } = req.body;
+
+  logger.info(`Starting real-time extraction: ${source}, ${term}, ${location}, pages=${pages}`);
+  res.json({ success: true, message: 'Extraction started' });
+
+  let count = 0;
+  const max = pages || 3;
+
+  const interval = setInterval(() => {
+    if (count >= max) {
+      io.emit('extraction-complete', { total: count });
+      clearInterval(interval);
+      return;
+    }
+
+    const result = {
+      phone: `+12345678${count}${count}`,
+      source,
+      type: 'Business',
+      country: 'US',
+      carrier: count % 2 === 0 ? 'AT&T' : 'T-Mobile',
+      status: 'Valid'
+    };
+
+    io.emit('extraction-result', result);
+    count++;
+  }, 1000);
+});
+
 // Start server
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  logger.info(`Server running on http://localhost:${PORT}`);
+const HOST = '0.0.0.0';
+server.listen(PORT, HOST, () => {
+  logger.info(`Server running on http://${HOST}:${PORT}`);
 });

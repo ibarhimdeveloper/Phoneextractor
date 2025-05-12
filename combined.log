@@ -33,3 +33,529 @@
 {"level":"info","message":"Server running on http://localhost:3000","timestamp":"2025-04-30T22:44:32.560Z"}
 {"level":"info","message":"Server running on http://localhost:3000","timestamp":"2025-04-30T23:09:58.949Z"}
 {"level":"info","message":"Server running on http://localhost:3000","timestamp":"2025-04-30T23:31:14.266Z"}
+{"level":"info","message":"Server running on http://localhost:3000","timestamp":"2025-05-01T16:38:19.591Z"}
+{"level":"info","message":"Server running on http://localhost:3000","timestamp":"2025-05-01T17:05:10.311Z"}
+{"level":"info","message":"Server running on http://localhost:3000","timestamp":"2025-05-01T17:25:56.997Z"}
+{"level":"info","message":"Server running on http://localhost:3000","timestamp":"2025-05-02T23:53:36.425Z"}
+{"level":"info","message":"Server running on http://localhost:3000","timestamp":"2025-05-03T17:30:11.417Z"}
+{"level":"info","message":"Server running on http://localhost:3000","timestamp":"2025-05-03T18:25:19.907Z"}
+{"level":"info","message":"Client connected: jFjC2XJLv8mSlUcNAAAB","timestamp":"2025-05-03T19:04:02.716Z"}
+{"level":"info","message":"Client disconnected: jFjC2XJLv8mSlUcNAAAB","timestamp":"2025-05-03T19:04:17.844Z"}
+{"level":"info","message":"Client connected: 8YF90kVFxsw-0rNdAAAD","timestamp":"2025-05-03T19:04:18.105Z"}
+{"level":"info","message":"Client disconnected: 8YF90kVFxsw-0rNdAAAD","timestamp":"2025-05-03T19:04:34.729Z"}
+{"level":"info","message":"Client connected: Fw1ZKJaVSwh_zVQ-AAAF","timestamp":"2025-05-03T19:04:35.001Z"}
+{"level":"info","message":"Client disconnected: Fw1ZKJaVSwh_zVQ-AAAF","timestamp":"2025-05-03T19:17:12.782Z"}
+{"level":"info","message":"Client connected: j5Nlw6fdp1s9pMeFAAAH","timestamp":"2025-05-03T19:21:42.795Z"}
+{"level":"info","message":"Client disconnected: j5Nlw6fdp1s9pMeFAAAH","timestamp":"2025-05-03T19:22:45.902Z"}
+{"level":"info","message":"Client connected: Bp9RrDNRpq9FsqX7AAAJ","timestamp":"2025-05-03T19:24:24.372Z"}
+{"level":"info","message":"Client disconnected: Bp9RrDNRpq9FsqX7AAAJ","timestamp":"2025-05-03T19:24:37.951Z"}
+{"level":"info","message":"Client connected: NOhaMmHl4H2Nv7qOAAAL","timestamp":"2025-05-03T19:24:38.181Z"}
+{"level":"info","message":"Client disconnected: NOhaMmHl4H2Nv7qOAAAL","timestamp":"2025-05-03T19:32:03.650Z"}
+{"level":"info","message":"Client connected: Yx5Ju5lbGWMnAAq0AAAN","timestamp":"2025-05-03T19:32:05.487Z"}
+{"level":"info","message":"Client disconnected: Yx5Ju5lbGWMnAAq0AAAN","timestamp":"2025-05-03T19:32:21.071Z"}
+{"level":"info","message":"Client connected: HgaBa449IBCwtcCKAAAP","timestamp":"2025-05-03T19:32:21.343Z"}
+{"level":"info","message":"Client disconnected: HgaBa449IBCwtcCKAAAP","timestamp":"2025-05-03T19:42:38.442Z"}
+{"level":"info","message":"Client connected: _ESYxxP18UyTpRqgAAAR","timestamp":"2025-05-03T19:42:40.089Z"}
+{"level":"info","message":"Client disconnected: _ESYxxP18UyTpRqgAAAR","timestamp":"2025-05-03T19:43:07.854Z"}
+{"level":"info","message":"Client connected: aET5N1ALf9yI3U5BAAAT","timestamp":"2025-05-03T19:43:08.183Z"}
+{"level":"info","message":"Client disconnected: aET5N1ALf9yI3U5BAAAT","timestamp":"2025-05-03T19:49:46.475Z"}
+{"level":"info","message":"Client connected: Q-BP-5dhqTRs-EvBAAAV","timestamp":"2025-05-03T19:49:48.324Z"}
+{"level":"info","message":"Client disconnected: Q-BP-5dhqTRs-EvBAAAV","timestamp":"2025-05-03T19:50:02.096Z"}
+{"level":"info","message":"Client connected: tXmLUTxE9u8ZT-d5AAAX","timestamp":"2025-05-03T19:50:02.370Z"}
+{"level":"info","message":"Client disconnected: tXmLUTxE9u8ZT-d5AAAX","timestamp":"2025-05-03T19:54:26.855Z"}
+{"level":"info","message":"Client connected: sC-G7_JmFpuMcgdUAAAZ","timestamp":"2025-05-03T19:54:28.250Z"}
+{"level":"info","message":"Client disconnected: sC-G7_JmFpuMcgdUAAAZ","timestamp":"2025-05-03T20:03:08.742Z"}
+{"level":"info","message":"Client connected: HTUyF-9yWWxZikmtAAAb","timestamp":"2025-05-03T20:17:42.749Z"}
+{"level":"info","message":"Client disconnected: HTUyF-9yWWxZikmtAAAb","timestamp":"2025-05-04T13:06:47.655Z"}
+{"level":"info","message":"Client connected: tma-n4P6h3LbTjRHAAAd","timestamp":"2025-05-04T13:06:51.121Z"}
+{"level":"info","message":"Server running on http://localhost:3000","timestamp":"2025-05-04T13:09:25.044Z"}
+{"level":"info","message":"Client connected: rOdE8AnZFbQyzGsVAAAB","timestamp":"2025-05-04T13:09:26.834Z"}
+{"level":"info","message":"Client disconnected: rOdE8AnZFbQyzGsVAAAB","timestamp":"2025-05-04T13:10:08.865Z"}
+{"level":"info","message":"Client connected: RAoxelXn-frz8dNhAAAD","timestamp":"2025-05-04T13:10:14.941Z"}
+{"level":"info","message":"Client disconnected: RAoxelXn-frz8dNhAAAD","timestamp":"2025-05-04T13:11:38.819Z"}
+{"level":"info","message":"Client connected: gm51I1ZAr4XYHMsIAAAF","timestamp":"2025-05-04T13:11:39.155Z"}
+{"level":"info","message":"Client disconnected: gm51I1ZAr4XYHMsIAAAF","timestamp":"2025-05-04T13:11:59.421Z"}
+{"level":"info","message":"Client connected: m86VqhYLRIE-cgwIAAAH","timestamp":"2025-05-04T13:11:59.688Z"}
+{"level":"info","message":"Client disconnected: m86VqhYLRIE-cgwIAAAH","timestamp":"2025-05-04T13:12:38.460Z"}
+{"level":"info","message":"Client connected: SVMwr1QUk-w6vvSNAAAJ","timestamp":"2025-05-04T13:12:38.682Z"}
+{"level":"info","message":"Client disconnected: SVMwr1QUk-w6vvSNAAAJ","timestamp":"2025-05-04T13:34:21.593Z"}
+{"level":"info","message":"Client connected: dcGEzSbmW1IVD-oSAAAL","timestamp":"2025-05-04T13:34:23.578Z"}
+{"level":"info","message":"Server running on http://localhost:3000","timestamp":"2025-05-04T13:36:15.656Z"}
+{"level":"info","message":"Client connected: qCYXI3lScQQgiQmdAAAB","timestamp":"2025-05-04T13:36:17.701Z"}
+{"level":"info","message":"Client disconnected: qCYXI3lScQQgiQmdAAAB","timestamp":"2025-05-04T13:36:30.164Z"}
+{"level":"info","message":"Client connected: ECd6pVXaPBXTSlKnAAAD","timestamp":"2025-05-04T13:36:32.071Z"}
+{"level":"info","message":"Client disconnected: ECd6pVXaPBXTSlKnAAAD","timestamp":"2025-05-04T14:04:23.866Z"}
+{"level":"info","message":"Server running on http://localhost:3000","timestamp":"2025-05-11T12:45:09.184Z"}
+{"level":"info","message":"Server running on http://localhost:3000","timestamp":"2025-05-11T12:57:32.170Z"}
+{"level":"info","message":"Server running on http://0.0.0.0:3000","timestamp":"2025-05-11T13:15:56.596Z"}
+{"level":"info","message":"Server running on http://0.0.0.0:3000","timestamp":"2025-05-11T13:23:40.498Z"}
+{"level":"info","message":"Client connected: x5K_mUgTNdf6TX4hAAAB","timestamp":"2025-05-11T14:22:30.853Z"}
+{"level":"info","message":"Client disconnected: x5K_mUgTNdf6TX4hAAAB","timestamp":"2025-05-11T14:23:32.422Z"}
+{"level":"info","message":"Client connected: 5tgf-NBlEcumoyVbAAAD","timestamp":"2025-05-11T14:23:36.518Z"}
+{"level":"info","message":"Server running on http://0.0.0.0:3000","timestamp":"2025-05-11T14:35:28.235Z"}
+{"level":"info","message":"Client connected: mn-qjiM5lymu0gu_AAAB","timestamp":"2025-05-11T14:35:28.382Z"}
+{"level":"info","message":"Client disconnected: mn-qjiM5lymu0gu_AAAB","timestamp":"2025-05-11T14:35:39.862Z"}
+{"level":"info","message":"Client connected: jQkcudwl9JmziMqqAAAD","timestamp":"2025-05-11T14:35:43.288Z"}
+{"level":"info","message":"Client disconnected: jQkcudwl9JmziMqqAAAD","timestamp":"2025-05-11T15:03:17.312Z"}
+{"level":"info","message":"Client connected: wS3k95jtVPQWKAm8AAAF","timestamp":"2025-05-11T15:03:20.629Z"}
+{"level":"info","message":"Client disconnected: wS3k95jtVPQWKAm8AAAF","timestamp":"2025-05-11T15:04:09.579Z"}
+{"level":"info","message":"Client connected: KdSod6ggLVIM2RbUAAAH","timestamp":"2025-05-11T15:04:10.146Z"}
+{"level":"info","message":"Client disconnected: KdSod6ggLVIM2RbUAAAH","timestamp":"2025-05-11T15:05:25.094Z"}
+{"level":"info","message":"Client connected: JfEFux9zGOxP50-DAAAJ","timestamp":"2025-05-11T15:05:29.009Z"}
+{"level":"info","message":"Client disconnected: JfEFux9zGOxP50-DAAAJ","timestamp":"2025-05-11T15:07:26.206Z"}
+{"level":"info","message":"Client connected: 7gDGBnOOru9VQGFfAAAL","timestamp":"2025-05-11T15:07:30.068Z"}
+{"level":"info","message":"Client disconnected: 7gDGBnOOru9VQGFfAAAL","timestamp":"2025-05-11T15:07:59.758Z"}
+{"level":"info","message":"Client connected: zm69Fx7YnqZuXOTeAAAN","timestamp":"2025-05-11T15:08:00.407Z"}
+{"level":"info","message":"Client disconnected: zm69Fx7YnqZuXOTeAAAN","timestamp":"2025-05-11T15:22:26.740Z"}
+{"level":"info","message":"Client connected: P7Fdl7dJkb_0np5wAAAP","timestamp":"2025-05-11T15:22:30.790Z"}
+{"level":"info","message":"Client disconnected: P7Fdl7dJkb_0np5wAAAP","timestamp":"2025-05-11T15:39:57.873Z"}
+{"level":"info","message":"Client connected: ZhiwPAJzezyIAAlXAAAR","timestamp":"2025-05-11T15:40:01.744Z"}
+{"level":"info","message":"Client disconnected: ZhiwPAJzezyIAAlXAAAR","timestamp":"2025-05-11T15:44:28.245Z"}
+{"level":"info","message":"Client connected: MEtn_EvMZggu5EcGAAAT","timestamp":"2025-05-11T15:44:32.005Z"}
+{"level":"info","message":"Client disconnected: MEtn_EvMZggu5EcGAAAT","timestamp":"2025-05-11T15:46:28.105Z"}
+{"level":"info","message":"Client connected: L-BsQxP2W37tB71nAAAV","timestamp":"2025-05-11T15:46:28.840Z"}
+{"level":"info","message":"Client disconnected: L-BsQxP2W37tB71nAAAV","timestamp":"2025-05-11T15:54:09.662Z"}
+{"level":"info","message":"Client connected: pmyNfUQi8buvgigeAAAX","timestamp":"2025-05-11T15:54:17.713Z"}
+{"level":"info","message":"Client disconnected: pmyNfUQi8buvgigeAAAX","timestamp":"2025-05-12T08:28:21.876Z"}
+{"level":"info","message":"Client connected: LtLw-UVaWDJAo-gSAAAZ","timestamp":"2025-05-12T08:28:23.385Z"}
+{"level":"info","message":"Server running on http://0.0.0.0:3000","timestamp":"2025-05-12T10:07:53.133Z"}
+{"level":"info","message":"Client connected: o4WIL4xFuhVtJ6AVAAAB","timestamp":"2025-05-12T10:08:20.932Z"}
+{"level":"info","message":"Client disconnected: o4WIL4xFuhVtJ6AVAAAB","timestamp":"2025-05-12T10:09:39.692Z"}
+{"level":"info","message":"Client connected: daD6BK5Ds9gMri32AAAD","timestamp":"2025-05-12T10:09:40.126Z"}
+{"level":"error","message":"API error for /scrape-global: socket is not defined","timestamp":"2025-05-12T10:09:53.841Z"}
+{"level":"error","message":"API error for /scrape-yellowpages: socket is not defined","timestamp":"2025-05-12T10:10:03.837Z"}
+{"level":"error","message":"API error for /scrape-yelp: socket is not defined","timestamp":"2025-05-12T10:10:09.128Z"}
+{"level":"error","message":"API error for /scrape-personal: socket is not defined","timestamp":"2025-05-12T10:10:15.992Z"}
+{"level":"error","message":"API error for /scrape-global: socket is not defined","timestamp":"2025-05-12T10:10:28.068Z"}
+{"level":"info","message":"Server running on http://0.0.0.0:3000","timestamp":"2025-05-12T10:36:41.766Z"}
+{"level":"info","message":"Client connected: L3ma8xtLiYsLO75KAAAB","timestamp":"2025-05-12T10:36:46.087Z"}
+{"level":"info","message":"Client disconnected: L3ma8xtLiYsLO75KAAAB","timestamp":"2025-05-12T10:37:03.020Z"}
+{"level":"info","message":"Client connected: C7Fu2W78IjOVDYQtAAAD","timestamp":"2025-05-12T10:37:08.570Z"}
+{"level":"info","location":"United States","message":"Starting YellowPages scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:37:21.551Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:37:21.552Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:37:21.751Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 2)","timestamp":"2025-05-12T10:37:23.755Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:37:23.773Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 3)","timestamp":"2025-05-12T10:37:27.792Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:37:27.801Z"}
+{"level":"error","message":"API error for /scrape-yellowpages: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:37:27.802Z"}
+{"level":"info","location":"United States","message":"Starting Yelp scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:37:39.092Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:37:39.092Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:37:39.101Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 2)","timestamp":"2025-05-12T10:37:41.115Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:37:41.127Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 3)","timestamp":"2025-05-12T10:37:45.147Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:37:45.159Z"}
+{"level":"error","message":"API error for /scrape-yelp: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:37:45.161Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:37:53.904Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:37:53.909Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 2)","timestamp":"2025-05-12T10:37:55.910Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:37:55.914Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 3)","timestamp":"2025-05-12T10:37:59.920Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:37:59.935Z"}
+{"level":"error","message":"API error for /scrape-personal: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:37:59.937Z"}
+{"level":"info","location":"United States","message":"Starting YellowPages scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:38:07.525Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:38:07.526Z"}
+{"level":"info","location":"United States","message":"Starting Yelp scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:38:07.526Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:38:07.527Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:38:07.528Z"}
+{"level":"info","location":"United States","message":"Starting Manta scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:38:07.529Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:38:07.529Z"}
+{"level":"info","location":"United States","message":"Starting BBB scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:38:07.531Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:38:07.535Z"}
+{"level":"info","location":"United States","message":"Starting Hotfrog scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:38:07.536Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:38:07.537Z"}
+{"level":"info","location":"United States","message":"Starting Foursquare scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:38:07.538Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:38:07.539Z"}
+{"level":"info","location":"United States","message":"Starting Brownbook scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:38:07.540Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:38:07.540Z"}
+{"level":"info","location":"United States","message":"Starting Cityfos scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:38:07.541Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:38:07.542Z"}
+{"level":"info","location":"United States","message":"Starting Cylex scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:38:07.543Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:38:07.543Z"}
+{"level":"info","location":"United States","message":"Starting MerchantCircle scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:38:07.544Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:38:07.545Z"}
+{"level":"info","location":"United States","message":"Starting Localstack scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:38:07.546Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:38:07.546Z"}
+{"level":"info","location":"United States","message":"Starting WhitePages scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:38:07.547Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:38:07.547Z"}
+{"level":"info","location":"United States","message":"Starting LinkedIn scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:38:07.548Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:38:07.554Z"}
+{"level":"info","location":"United States","message":"Starting Facebook scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:38:07.555Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:38:07.556Z"}
+{"level":"info","location":"United States","message":"Starting TruePeopleSearch scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:38:07.556Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:38:07.557Z"}
+{"level":"info","location":"United States","message":"Starting AnyWho scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:38:07.557Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:38:07.558Z"}
+{"level":"info","location":"United States","message":"Starting Spokeo scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:38:07.560Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:38:07.560Z"}
+{"level":"info","location":"United States","message":"Starting FastPeopleSearch scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:38:07.561Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:38:07.561Z"}
+{"level":"info","location":"United States","message":"Starting 411 scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:38:07.561Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:38:07.562Z"}
+{"level":"info","location":"United States","message":"Starting USPhonebook scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:38:07.562Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:38:07.562Z"}
+{"level":"info","location":"United States","message":"Starting Radaris scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:38:07.563Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:38:07.563Z"}
+{"level":"info","location":"United States","message":"Starting ZabaSearch scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:38:07.563Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:38:07.563Z"}
+{"level":"info","location":"United States","message":"Starting PeopleFinders scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:38:07.564Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:38:07.570Z"}
+{"level":"info","location":"United States","message":"Starting PeekYou scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:38:07.570Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:38:07.571Z"}
+{"level":"info","location":"United States","message":"Starting ThatsThem scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:38:07.572Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:38:07.572Z"}
+{"level":"info","location":"United States","message":"Starting Addresses scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:38:07.573Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:38:07.573Z"}
+{"level":"info","location":"United States","message":"Starting Pipl scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:38:07.574Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:38:07.574Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:07.629Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:07.633Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:07.636Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:07.638Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:07.639Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:07.640Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:07.641Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:07.641Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:07.642Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:07.643Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:07.644Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:07.645Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:07.645Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:07.646Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:07.647Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:07.657Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:07.658Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:07.660Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:07.661Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:07.662Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:07.664Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:07.671Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:07.672Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:07.673Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:07.673Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:07.675Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:07.676Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:07.676Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 2)","timestamp":"2025-05-12T10:38:09.634Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 2)","timestamp":"2025-05-12T10:38:09.635Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 2)","timestamp":"2025-05-12T10:38:09.637Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 2)","timestamp":"2025-05-12T10:38:09.639Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 2)","timestamp":"2025-05-12T10:38:09.640Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 2)","timestamp":"2025-05-12T10:38:09.641Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 2)","timestamp":"2025-05-12T10:38:09.642Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 2)","timestamp":"2025-05-12T10:38:09.643Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:09.644Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:09.645Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 2)","timestamp":"2025-05-12T10:38:09.646Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 2)","timestamp":"2025-05-12T10:38:09.647Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 2)","timestamp":"2025-05-12T10:38:09.651Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 2)","timestamp":"2025-05-12T10:38:09.652Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 2)","timestamp":"2025-05-12T10:38:09.653Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 2)","timestamp":"2025-05-12T10:38:09.654Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 2)","timestamp":"2025-05-12T10:38:09.657Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 2)","timestamp":"2025-05-12T10:38:09.657Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:09.660Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 2)","timestamp":"2025-05-12T10:38:09.662Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 2)","timestamp":"2025-05-12T10:38:09.663Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 2)","timestamp":"2025-05-12T10:38:09.670Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 2)","timestamp":"2025-05-12T10:38:09.674Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 2)","timestamp":"2025-05-12T10:38:09.674Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 2)","timestamp":"2025-05-12T10:38:09.675Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 2)","timestamp":"2025-05-12T10:38:09.676Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 2)","timestamp":"2025-05-12T10:38:09.676Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 2)","timestamp":"2025-05-12T10:38:09.677Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:09.680Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:09.685Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 2)","timestamp":"2025-05-12T10:38:09.689Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 2)","timestamp":"2025-05-12T10:38:09.689Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 2)","timestamp":"2025-05-12T10:38:09.690Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:09.692Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:09.693Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:09.704Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:09.705Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:09.706Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:09.706Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:09.707Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:09.708Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:09.711Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:09.712Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:09.713Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:09.720Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:09.722Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:09.723Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:09.724Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:09.725Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:09.735Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:09.738Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:09.741Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:09.746Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:09.757Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:09.763Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:09.776Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 3)","timestamp":"2025-05-12T10:38:13.659Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 3)","timestamp":"2025-05-12T10:38:13.662Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 3)","timestamp":"2025-05-12T10:38:13.665Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:13.672Z"}
+{"level":"error","message":"API error for /scrape-global: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:13.672Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:13.675Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:13.677Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 3)","timestamp":"2025-05-12T10:38:13.690Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 3)","timestamp":"2025-05-12T10:38:13.691Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 3)","timestamp":"2025-05-12T10:38:13.692Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 3)","timestamp":"2025-05-12T10:38:13.693Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:13.698Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:13.703Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:13.705Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:13.706Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 3)","timestamp":"2025-05-12T10:38:13.707Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 3)","timestamp":"2025-05-12T10:38:13.708Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 3)","timestamp":"2025-05-12T10:38:13.709Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 3)","timestamp":"2025-05-12T10:38:13.709Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 3)","timestamp":"2025-05-12T10:38:13.710Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 3)","timestamp":"2025-05-12T10:38:13.711Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 3)","timestamp":"2025-05-12T10:38:13.713Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 3)","timestamp":"2025-05-12T10:38:13.713Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 3)","timestamp":"2025-05-12T10:38:13.721Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 3)","timestamp":"2025-05-12T10:38:13.723Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 3)","timestamp":"2025-05-12T10:38:13.724Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 3)","timestamp":"2025-05-12T10:38:13.725Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 3)","timestamp":"2025-05-12T10:38:13.726Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:13.728Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:13.729Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:13.730Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:13.734Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:13.738Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 3)","timestamp":"2025-05-12T10:38:13.739Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 3)","timestamp":"2025-05-12T10:38:13.740Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:13.742Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 3)","timestamp":"2025-05-12T10:38:13.742Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:13.744Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:13.744Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 3)","timestamp":"2025-05-12T10:38:13.745Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:13.746Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:13.748Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:13.754Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:13.755Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 3)","timestamp":"2025-05-12T10:38:13.756Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:13.757Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:13.759Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:13.760Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:13.761Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 3)","timestamp":"2025-05-12T10:38:13.762Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:13.763Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:13.767Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:13.771Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 3)","timestamp":"2025-05-12T10:38:13.787Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 3)","timestamp":"2025-05-12T10:38:13.790Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:13.794Z"}
+{"level":"error","message":"Browser launch failed: Could not find Chrome (ver. 135.0.7049.114). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: C:\\Users\\hp\\.cache\\puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.","timestamp":"2025-05-12T10:38:13.796Z"}
+{"level":"info","message":"Client disconnected: C7Fu2W78IjOVDYQtAAAD","timestamp":"2025-05-12T10:42:11.621Z"}
+{"level":"info","message":"Client connected: hriWyzINU_pRkYy5AAAF","timestamp":"2025-05-12T10:42:12.041Z"}
+{"level":"info","message":"Server running on http://0.0.0.0:3000","timestamp":"2025-05-12T10:45:03.451Z"}
+{"level":"info","message":"Client connected: WXXmafsS0X1bvNkyAAAB","timestamp":"2025-05-12T10:45:04.346Z"}
+{"level":"info","message":"Client disconnected: WXXmafsS0X1bvNkyAAAB","timestamp":"2025-05-12T10:45:57.287Z"}
+{"level":"info","message":"Client connected: YSrxAlkjInS4r1LJAAAD","timestamp":"2025-05-12T10:45:57.677Z"}
+{"level":"info","message":"Client disconnected: YSrxAlkjInS4r1LJAAAD","timestamp":"2025-05-12T10:46:44.236Z"}
+{"level":"info","message":"Client connected: v1gz8o-7MqqmicQ7AAAF","timestamp":"2025-05-12T10:46:44.543Z"}
+{"level":"info","message":"Client disconnected: v1gz8o-7MqqmicQ7AAAF","timestamp":"2025-05-12T10:57:15.322Z"}
+{"level":"info","message":"Client connected: i_jZwH2kN4jVzqmfAAAH","timestamp":"2025-05-12T10:57:15.617Z"}
+{"level":"info","location":"United States","message":"Starting YellowPages scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:57:18.884Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:57:18.886Z"}
+{"level":"info","location":"United States","message":"Starting Yelp scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:57:19.044Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:57:19.045Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:57:19.046Z"}
+{"level":"info","location":"United States","message":"Starting Manta scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:57:19.047Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:57:19.048Z"}
+{"level":"info","location":"United States","message":"Starting BBB scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:57:19.048Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:57:19.048Z"}
+{"level":"info","location":"United States","message":"Starting Hotfrog scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:57:19.049Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:57:19.049Z"}
+{"level":"info","location":"United States","message":"Starting Foursquare scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:57:19.050Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:57:19.050Z"}
+{"level":"info","location":"United States","message":"Starting Brownbook scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:57:19.051Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:57:19.051Z"}
+{"level":"info","location":"United States","message":"Starting Cityfos scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:57:19.051Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:57:19.052Z"}
+{"level":"info","location":"United States","message":"Starting Cylex scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:57:19.052Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:57:19.056Z"}
+{"level":"info","location":"United States","message":"Starting MerchantCircle scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:57:19.058Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:57:19.058Z"}
+{"level":"info","location":"United States","message":"Starting Localstack scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:57:19.059Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:57:19.059Z"}
+{"level":"info","location":"United States","message":"Starting WhitePages scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:57:19.060Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:57:19.060Z"}
+{"level":"info","location":"United States","message":"Starting LinkedIn scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:57:19.060Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:57:19.061Z"}
+{"level":"info","location":"United States","message":"Starting Facebook scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:57:19.061Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:57:19.061Z"}
+{"level":"info","location":"United States","message":"Starting TruePeopleSearch scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:57:19.062Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:57:19.062Z"}
+{"level":"info","location":"United States","message":"Starting AnyWho scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:57:19.063Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:57:19.063Z"}
+{"level":"info","location":"United States","message":"Starting Spokeo scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:57:19.064Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:57:19.064Z"}
+{"level":"info","location":"United States","message":"Starting FastPeopleSearch scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:57:19.065Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:57:19.065Z"}
+{"level":"info","location":"United States","message":"Starting 411 scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:57:19.066Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:57:19.066Z"}
+{"level":"info","location":"United States","message":"Starting USPhonebook scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:57:19.067Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:57:19.067Z"}
+{"level":"info","location":"United States","message":"Starting Radaris scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:57:19.068Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:57:19.068Z"}
+{"level":"info","location":"United States","message":"Starting ZabaSearch scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:57:19.068Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:57:19.069Z"}
+{"level":"info","location":"United States","message":"Starting PeopleFinders scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:57:19.071Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:57:19.072Z"}
+{"level":"info","location":"United States","message":"Starting PeekYou scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:57:19.074Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:57:19.074Z"}
+{"level":"info","location":"United States","message":"Starting ThatsThem scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:57:19.074Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:57:19.075Z"}
+{"level":"info","location":"United States","message":"Starting Addresses scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:57:19.075Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:57:19.076Z"}
+{"level":"info","location":"United States","message":"Starting Pipl scrape","pages":10,"searchTerm":"Plumber","timestamp":"2025-05-12T10:57:19.077Z"}
+{"level":"info","message":"Attempting to launch browser (attempt 1)","timestamp":"2025-05-12T10:57:19.078Z"}
+{"level":"info","message":"Browser launched successfully","timestamp":"2025-05-12T10:57:39.158Z"}
+{"level":"info","message":"Browser launched successfully","timestamp":"2025-05-12T10:57:39.237Z"}
+{"level":"info","message":"Browser launched successfully","timestamp":"2025-05-12T10:57:39.415Z"}
+{"level":"info","message":"Browser launched successfully","timestamp":"2025-05-12T10:57:40.257Z"}
+{"level":"info","message":"Browser launched successfully","timestamp":"2025-05-12T10:57:42.727Z"}
+{"level":"info","message":"Browser launched successfully","timestamp":"2025-05-12T10:57:43.454Z"}
+{"level":"info","message":"Browser launched successfully","timestamp":"2025-05-12T10:57:44.477Z"}
+{"level":"info","message":"Browser launched successfully","timestamp":"2025-05-12T10:57:44.690Z"}
+{"level":"info","message":"Browser launched successfully","timestamp":"2025-05-12T10:57:44.901Z"}
+{"level":"info","message":"Browser launched successfully","timestamp":"2025-05-12T10:57:44.989Z"}
+{"level":"info","message":"Browser launched successfully","timestamp":"2025-05-12T10:57:45.329Z"}
+{"level":"info","message":"Browser launched successfully","timestamp":"2025-05-12T10:57:45.376Z"}
+{"level":"info","message":"Browser launched successfully","timestamp":"2025-05-12T10:57:45.387Z"}
+{"level":"info","message":"Browser launched successfully","timestamp":"2025-05-12T10:57:45.626Z"}
+{"level":"info","message":"Browser launched successfully","timestamp":"2025-05-12T10:57:46.026Z"}
+{"level":"info","message":"Browser launched successfully","timestamp":"2025-05-12T10:57:46.041Z"}
+{"level":"info","message":"Browser launched successfully","timestamp":"2025-05-12T10:57:47.386Z"}
+{"level":"info","message":"Browser launched successfully","timestamp":"2025-05-12T10:57:47.693Z"}
+{"level":"info","message":"Browser launched successfully","timestamp":"2025-05-12T10:57:48.157Z"}
+{"level":"info","message":"Browser launched successfully","timestamp":"2025-05-12T10:57:48.859Z"}
+{"level":"info","message":"Browser launched successfully","timestamp":"2025-05-12T10:57:49.636Z"}
+{"level":"info","message":"Browser launched successfully","timestamp":"2025-05-12T10:57:49.993Z"}
+{"level":"info","message":"Browser launched successfully","timestamp":"2025-05-12T10:57:50.186Z"}
+{"level":"info","message":"Browser launched successfully","timestamp":"2025-05-12T10:57:51.230Z"}
+{"level":"info","message":"Browser launched successfully","timestamp":"2025-05-12T10:57:51.315Z"}
+{"level":"info","message":"Browser launched successfully","timestamp":"2025-05-12T10:57:51.330Z"}
+{"level":"info","message":"Browser launched successfully","timestamp":"2025-05-12T10:57:51.380Z"}
+{"level":"info","message":"Browser launched successfully","timestamp":"2025-05-12T10:57:53.441Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T10:58:15.245Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T10:58:17.999Z"}
+{"level":"error","message":"Localstack page 1 error: net::ERR_TOO_MANY_REDIRECTS at https://www.localstack.com/search?find_desc=Plumber&find_loc=United%20States&page=1","timestamp":"2025-05-12T10:58:19.686Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T10:58:22.929Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T10:58:25.728Z"}
+{"level":"error","message":"Radaris page 1 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:58:29.844Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T10:58:30.783Z"}
+{"level":"error","message":"PeekYou page 1 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:58:32.696Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T10:58:33.690Z"}
+{"level":"error","message":"Localstack page 2 error: net::ERR_TOO_MANY_REDIRECTS at https://www.localstack.com/search?find_desc=Plumber&find_loc=United%20States&page=2","timestamp":"2025-05-12T10:58:34.397Z"}
+{"level":"error","message":"Brownbook page 1 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:58:34.448Z"}
+{"level":"error","message":"Addresses page 1 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:58:34.599Z"}
+{"level":"error","message":"Hotfrog page 1 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:58:43.120Z"}
+{"level":"error","message":"Cityfos page 1 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:58:43.120Z"}
+{"level":"error","message":"Facebook page 1 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:58:43.121Z"}
+{"level":"error","message":"BBB page 1 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:58:43.122Z"}
+{"level":"error","message":"AnyWho page 1 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:58:43.123Z"}
+{"level":"error","message":"Yelp page 1 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:58:43.123Z"}
+{"level":"error","message":"Spokeo page 1 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:58:43.124Z"}
+{"level":"error","message":"MerchantCircle page 1 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:58:43.124Z"}
+{"level":"error","message":"Personal search error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:58:43.125Z"}
+{"level":"error","message":"ThatsThem page 1 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:58:43.126Z"}
+{"level":"error","message":"TruePeopleSearch page 1 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:58:43.126Z"}
+{"level":"error","message":"Manta page 1 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:58:43.127Z"}
+{"level":"error","message":"LinkedIn page 1 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:58:43.127Z"}
+{"level":"error","message":"ZabaSearch page 1 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:58:43.128Z"}
+{"level":"error","message":"411 page 1 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:58:43.128Z"}
+{"level":"error","message":"FastPeopleSearch page 1 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:58:43.129Z"}
+{"level":"error","message":"Cylex page 1 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:58:43.129Z"}
+{"level":"error","message":"USPhonebook page 1 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:58:43.129Z"}
+{"level":"error","message":"WhitePages page 2 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:58:49.267Z"}
+{"level":"error","message":"YellowPages page 2 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:59:00.310Z"}
+{"level":"error","message":"Pipl page 2 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:59:03.894Z"}
+{"level":"error","message":"Radaris page 2 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:59:04.284Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T10:59:05.211Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T10:59:20.731Z"}
+{"level":"error","message":"PeekYou page 2 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:59:30.365Z"}
+{"level":"error","message":"AnyWho page 2 error: net::ERR_CONNECTION_TIMED_OUT at https://www.anywho.com/people/Plumber/United%20States?page=2","timestamp":"2025-05-12T10:59:32.153Z"}
+{"level":"error","message":"Localstack page 3 error: net::ERR_TOO_MANY_REDIRECTS at https://www.localstack.com/search?find_desc=Plumber&find_loc=United%20States&page=3","timestamp":"2025-05-12T10:59:32.811Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T10:59:33.487Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T10:59:33.780Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T10:59:35.275Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T10:59:35.285Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T10:59:39.427Z"}
+{"level":"error","message":"Addresses page 2 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:59:41.731Z"}
+{"level":"error","message":"MerchantCircle page 2 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:59:43.050Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T10:59:45.661Z"}
+{"level":"error","message":"411 page 2 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:59:46.040Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T10:59:47.765Z"}
+{"level":"error","message":"Hotfrog page 2 error: seenNumbers is not defined","timestamp":"2025-05-12T10:59:48.024Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T10:59:50.059Z"}
+{"level":"error","message":"Hotfrog error: Protocol error (Target.createTarget): Session with given id not found.","timestamp":"2025-05-12T10:59:50.210Z"}
+{"level":"error","message":"BBB page 2 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:59:58.692Z"}
+{"level":"error","message":"YellowPages page 3 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:59:58.693Z"}
+{"level":"error","message":"FastPeopleSearch page 2 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:59:58.694Z"}
+{"level":"error","message":"ZabaSearch page 2 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:59:58.695Z"}
+{"level":"error","message":"Yelp page 2 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:59:58.696Z"}
+{"level":"error","message":"Spokeo page 2 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:59:58.697Z"}
+{"level":"error","message":"Cylex page 2 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:59:58.697Z"}
+{"level":"error","message":"TruePeopleSearch page 2 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:59:58.698Z"}
+{"level":"error","message":"Cityfos page 2 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:59:58.699Z"}
+{"level":"error","message":"USPhonebook page 2 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:59:58.700Z"}
+{"level":"error","message":"Facebook page 2 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:59:58.701Z"}
+{"level":"error","message":"LinkedIn page 2 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:59:58.702Z"}
+{"level":"error","message":"ThatsThem page 2 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:59:58.703Z"}
+{"level":"error","message":"Manta page 2 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:59:58.706Z"}
+{"level":"error","message":"Radaris page 3 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T10:59:58.707Z"}
+{"level":"error","message":"411 page 3 error: net::ERR_ABORTED at https://www.411.com/name/Plumber/United%20States?page=3","timestamp":"2025-05-12T10:59:58.735Z"}
+{"level":"error","message":"MerchantCircle page 3 error: net::ERR_ABORTED at https://www.merchantcircle.com/search?q=Plumber&loc=United%20States&start=20","timestamp":"2025-05-12T10:59:58.741Z"}
+{"level":"error","message":"PeekYou page 3 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T11:00:07.573Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T11:00:09.165Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T11:00:14.049Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T11:00:14.096Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T11:00:14.452Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T11:00:17.131Z"}
+{"level":"error","message":"YellowPages page 4 error: seenNumbers is not defined","timestamp":"2025-05-12T11:00:19.179Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T11:00:23.211Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T11:00:23.392Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T11:00:24.699Z"}
+{"level":"error","message":"Addresses page 3 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T11:00:29.585Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T11:00:32.033Z"}
+{"level":"error","message":"Cylex page 3 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T11:00:32.551Z"}
+{"level":"error","message":"ThatsThem page 3 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T11:00:32.596Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T11:00:32.626Z"}
+{"level":"error","message":"Localstack page 4 error: net::ERR_TOO_MANY_REDIRECTS at https://www.localstack.com/search?find_desc=Plumber&find_loc=United%20States&page=4","timestamp":"2025-05-12T11:00:33.915Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T11:00:34.610Z"}
+{"level":"error","message":"Cityfos page 3 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T11:00:35.577Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T11:00:36.429Z"}
+{"level":"error","message":"Spokeo page 3 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T11:00:36.628Z"}
+{"level":"error","message":"Facebook page 3 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T11:00:36.701Z"}
+{"level":"error","message":"MerchantCircle page 4 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T11:00:36.712Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T11:00:37.382Z"}
+{"level":"error","message":"PeekYou page 4 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T11:00:37.981Z"}
+{"level":"error","message":"411 page 4 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T11:00:38.481Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T11:00:40.014Z"}
+{"level":"error","message":"Yelp page 3 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T11:00:41.130Z"}
+{"level":"error","message":"Manta page 3 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T11:00:41.177Z"}
+{"level":"error","message":"AnyWho page 3 error: net::ERR_CONNECTION_TIMED_OUT at https://www.anywho.com/people/Plumber/United%20States?page=3","timestamp":"2025-05-12T11:00:45.485Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T11:00:50.931Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T11:00:53.901Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T11:00:56.595Z"}
+{"level":"error","message":"ThatsThem page 4 error: seenNumbers is not defined","timestamp":"2025-05-12T11:00:56.681Z"}
+{"level":"error","message":"Localstack page 5 error: net::ERR_TOO_MANY_REDIRECTS at https://www.localstack.com/search?find_desc=Plumber&find_loc=United%20States&page=5","timestamp":"2025-05-12T11:00:59.479Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T11:01:01.176Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T11:01:02.344Z"}
+{"level":"error","message":"BBB page 3 error: seenNumbers is not defined","timestamp":"2025-05-12T11:01:08.949Z"}
+{"level":"error","message":"WhitePages error: Protocol error (Target.createTarget): Session with given id not found.","timestamp":"2025-05-12T11:01:19.862Z"}
+{"level":"error","message":"YellowPages page 5 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T11:01:28.429Z"}
+{"level":"error","message":"Cityfos page 4 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T11:01:28.455Z"}
+{"level":"error","message":"411 page 5 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T11:01:28.464Z"}
+{"level":"error","message":"Spokeo page 4 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T11:01:28.482Z"}
+{"level":"error","message":"Yelp page 4 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T11:01:28.494Z"}
+{"level":"error","message":"Manta page 4 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T11:01:28.498Z"}
+{"level":"error","message":"PeekYou page 5 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T11:01:28.512Z"}
+{"level":"error","message":"AnyWho page 4 error: Navigation timeout of 30000 ms exceeded","timestamp":"2025-05-12T11:01:28.513Z"}
+{"level":"info","message":"No CAPTCHA found.","timestamp":"2025-05-12T11:01:32.493Z"}

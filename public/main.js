@@ -1,80 +1,302 @@
-function getCookie(name) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(';').shift();
-}
+const socket = io({
+  reconnection: true,
+  reconnectionAttempts: Infinity,
+  reconnectionDelay: 1000,
+  reconnectionDelayMax: 5000,
+  timeout: 20000,
+  transports: ['websocket'] // Force WebSocket transport
+});
 
-// Admin configuration
-const CREDENTIAL_EXPIRY_DAYS = 14; // 2 weeks expiry
+// Add connection status logging
+socket.on('connect', () => {
+  console.log('Connected to server with socket ID:', socket.id);
+  socketId = socket.id;
+});
 
-// Central DOM elements store
+socket.on('disconnect', () => {
+  console.log('Disconnected from server');
+});
+
+socket.on('connect_error', (err) => {
+  console.error('Socket connection error:', err);
+  showToast('Connection error - trying to reconnect...', 'warning');
+});
+
+socket.on('extraction-result', (data) => {
+  const tbody = document.getElementById('resultTableBody');
+  const row = document.createElement('tr');
+  row.setAttribute('data-number', data.phone);
+  row.innerHTML = `
+    <td>${tbody.children.length + 1}</td>
+    <td>${data.phone}</td>
+    <td>${data.source}</td>
+    <td>${data.type}</td>
+    <td>${data.country}</td>
+    <td>${data.carrier}</td>
+    <td class="text-success">${data.status}</td>
+  `;
+  tbody.appendChild(row);
+
+  document.getElementById('resultCount').textContent = `${tbody.children.length} numbers`;
+});
+
+// Socket events for extraction
+socket.on('phoneNumber', (data) => {
+  if (!isStopped && data?.number && !existingNumbers.has(data.number)) {
+    existingNumbers.add(data.number);
+    const { number, source } = data;
+    showNumber(number, source);
+    extractedNumbers.push({ number, source });
+    updateResultCount();
+  }
+});
+
+socket.on('progress', (percent) => {
+  if (elements.extractionProgress) {
+    elements.extractionProgress.style.width = `${percent}%`;
+    if (elements.statusText) {
+      elements.statusText.textContent = `Extracting... ${percent}%`;
+    }
+  }
+});
+
+let currentUser = null;
+let socketId = null;
+socket.on('connect', () => {
+  console.log('Connected to server with socket ID:', socket.id);
+  socketId = socket.id;
+  // Refresh credentials if in admin panel
+  if (document.getElementById('adminPanel')?.style.display === 'block') {
+    fetchAndDisplayCredentials();
+  }
+});
+let isStopped = false;
+let extractedNumbers = [];
+let existingNumbers = new Set();
+let isAuthenticated = false;
+
+// DOM Elements
 const elements = {
-  searchTermInput: document.getElementById('searchTerm'),
-  searchTermLabel: document.querySelector('label[for="searchTerm"]'),
-  locationInput: document.getElementById('location'),
-  customUrlInput: document.getElementById('customUrl'),
-  pagesInput: document.getElementById('pages'),
-  depthInput: document.getElementById('depthPages'),
-  depthValue: document.getElementById('depthValue'),
-  resultTableBody: document.getElementById('resultTableBody'),
-  extractionProgress: document.getElementById('extractionProgress'),
-  stopBtn: document.getElementById('stopBtn'),
-  saveBtn: document.getElementById('saveToNotepad'),
   extractBtn: document.getElementById('extractBtn'),
-  resultCount: document.getElementById('resultCount'),
-  statusText: document.getElementById('statusText'),
+  extractForm: document.getElementById('extractForm'),
+  stopBtn: document.getElementById('stopBtn'),
   signInBtn: document.getElementById('signInBtn'),
-  adminBtn: document.getElementById('adminBtn'),
-  adminLoginBtn: document.getElementById('adminLoginBtn'),
-  adminLogoutBtn: document.getElementById('adminLogoutBtn'),
-  generateCredentialsBtn: document.getElementById('generateCredentialsBtn'),
   signInForm: document.getElementById('signInForm'),
   usernameInput: document.getElementById('usernameInput'),
   passwordInput: document.getElementById('passwordInput'),
-  adminPasswordInput: document.getElementById('adminPassword'),
-  generateUsernameInput: document.getElementById('generateUsername'),
-  credentialsList: document.getElementById('credentialsList'),
-  proxyList: document.getElementById('proxyList'),
-  saveProxiesBtn: document.getElementById('saveProxiesBtn'),
-  verifyNumbersBtn: document.getElementById('verifyNumbersBtn'),
-  adminModal: document.getElementById('adminModal'),
   adminLoginForm: document.getElementById('adminLoginForm'),
-  adminPanel: document.getElementById('adminPanel')
+  adminLoginBtn: document.getElementById('adminLoginBtn'),
+  adminLogoutBtn: document.getElementById('adminLogoutBtn'),
+  credentialsList: document.getElementById('credentialsList'),
+  adminPanel: document.getElementById('adminPanel'),
+  sourceSelect: document.getElementById('source'),
+  searchTermInput: document.getElementById('searchTerm'),
+  locationInput: document.getElementById('location'),
+  pagesInput: document.getElementById('pages'),
+  customUrlInput: document.getElementById('customUrl'),
+  depthInput: document.getElementById('depthPages'),
+  depthValue: document.getElementById('depthValue'),
+  resultTableBody: document.getElementById('resultTableBody'),
+  resultCount: document.getElementById('resultCount'),
+  statusText: document.getElementById('statusText'),
+  extractionProgress: document.getElementById('extractionProgress'),
+  saveToNotepad: document.getElementById('saveToNotepad')
 };
 
-// Credentials data store
-let credentialsData = JSON.parse(localStorage.getItem('credentials')) || {};
-updateCredentialsListUI(); // call after parsing credentials
-let isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
-let storedUsername = localStorage.getItem('username') || '';
+// Initialize the app
+document.addEventListener('DOMContentLoaded', async () => {
+  await checkAuth();
+  setupEventListeners();
+  
+  // Initialize form visibility
+  handleFormVisibility();
+  
+  // Initialize depth slider
+  if (elements.depthInput) {
+    elements.depthInput.addEventListener('input', updateDepthValue);
+    updateDepthValue();
+  }
+  
+  // Initialize extraction form
+  initExtractionForm();
+});
 
-// Generate New Credentials
-function generateCredentials() {
-  const username = `user${Date.now().toString().slice(-5)}`;
-  const password = Math.random().toString(36).slice(-8);
-  const createdAt = new Date().toISOString();
+// Check authentication status
+async function checkAuth() {
+  try {
+    const response = await fetch('/check-auth', {
+      credentials: 'include'
+    });
 
-  credentialsData[username] = { password, createdAt };
-  localStorage.setItem('credentials', JSON.stringify(credentialsData));
-
-  updateCredentialsListUI(); // show on UI
+    if (response.ok) {
+      const data = await response.json();
+      if (data.success && data.user) {
+        currentUser = data.user;
+        updateUI();
+        return true;
+      }
+    }
+    updateUI(); // ensure UI updates even if not logged in
+    return false;
+  } catch (err) {
+    console.error('Auth check failed:', err);
+    updateUI();
+    return false;
+  }
 }
 
-// Update updateCredentialsList function
-async function updateCredentialsList() {
+// Update UI based on auth state
+function updateUI() {
+  const isLoggedIn = !!currentUser;
+  elements.extractBtn.disabled = !isLoggedIn;
+  elements.stopBtn.disabled = !isLoggedIn;
+
+  elements.signInBtn.innerHTML = isLoggedIn
+    ? `<i class="fas fa-sign-out-alt me-2"></i> Sign Out (${currentUser.username})`
+    : '<i class="fas fa-sign-in-alt me-2"></i> Sign In';
+}
+
+// Setup event listeners
+function setupEventListeners() {
+  // Sign in/out
+  elements.signInBtn?.addEventListener('click', async () => {
+    if (currentUser) {
+      await handleSignOut();
+    } else {
+      new bootstrap.Modal(document.getElementById('signInModal')).show();
+    }
+  });
+}
+  // Sign in form submission
+  elements.signInForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    await handleUserLogin(e);
+  });
+
+  // Admin login
+  elements.adminLoginBtn?.addEventListener('click', handleAdminLogin);
+
+  // Admin logout
+  elements.adminLogoutBtn?.addEventListener('click', handleAdminLogout);
+  
+  // Add these if missing
+  elements.extractForm?.addEventListener('submit', handleFormSubmit);
+  elements.stopBtn?.addEventListener('click', stopExtraction);
+
+// Handle user login
+async function handleUserLogin(e) {
+  const username = elements.usernameInput.value;
+  const password = elements.passwordInput.value;
+
+  try {
+    const response = await fetch('/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ username, password })
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      currentUser = { username: data.username };
+      showToast('Signed in successfully!', 'success');
+      updateUI();
+      bootstrap.Modal.getInstance(document.getElementById('signInModal')).hide();
+    } else {
+      showToast(data.error || 'Invalid credentials', 'danger');
+    }
+  } catch (err) {
+    showToast('Login failed', 'danger');
+    console.error('Login error:', err);
+  }
+}
+
+// Handle sign out
+async function handleSignOut() {
+  try {
+    await fetch('/logout', {
+      method: 'POST',
+      credentials: 'include'
+    });
+
+    currentUser = null;
+    updateUI();
+    showToast('Signed out successfully', 'success');
+  } catch (err) {
+    showToast('Logout failed', 'danger');
+    console.error('Logout error:', err);
+  }
+}
+
+// Admin login
+async function handleAdminLogin() {
+  const password = document.getElementById('adminPassword').value;
+
+  try {
+    const response = await fetch('/admin-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ password })
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      elements.adminLoginForm.style.display = 'none';
+      elements.adminPanel.style.display = 'block';
+      await fetchAndDisplayCredentials();
+      showToast('Admin login successful', 'success');
+    } else {
+      throw new Error(data.error || 'Wrong password');
+    }
+  } catch (err) {
+    showToast(err.message, 'danger');
+    console.error('Admin login error:', err);
+  }
+}
+
+// Update handleAdminLogout function
+async function handleAdminLogout() {
+  try {
+    await fetch('/logout', {
+      method: 'POST',
+      credentials: 'include'
+    });
+    elements.adminPanel.style.display = 'none';
+    elements.adminLoginForm.style.display = 'block';
+    document.getElementById('adminPassword').value = '';
+    
+    // Clear credentials list
+    const tbody = document.getElementById('credentialsList');
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5" class="text-center py-4 text-muted">
+          No credentials generated yet
+        </td>
+      </tr>
+    `;
+    showToast('Admin logged out', 'info');
+  } catch (err) {
+    showToast('Logout failed', 'danger');
+    console.error('Admin logout error:', err);
+  }
+}
+
+// Fetch and display credentials
+async function fetchAndDisplayCredentials() {
   try {
     const response = await fetch('/get-credentials', {
-      headers: { 'Authorization': `Bearer ${getCookie('jwt')}` }
-	  credentials: 'include'
+      credentials: 'include'
     });
     const data = await response.json();
-    
+
     if (!data.success) throw new Error(data.error || 'Failed to fetch credentials');
-    
-    elements.credentialsList.innerHTML = '';
-    
+
+    const tbody = document.getElementById('credentialsList');
+    tbody.innerHTML = '';
+
     if (data.credentials.length === 0) {
-      elements.credentialsList.innerHTML = `
+      tbody.innerHTML = `
         <tr>
           <td colspan="6" class="text-center py-4 text-muted">
             No credentials generated yet
@@ -83,19 +305,22 @@ async function updateCredentialsList() {
       `;
       return;
     }
-    
+
     data.credentials.forEach(cred => {
       const row = document.createElement('tr');
+      const expiresAt = cred.expires_at ? new Date(cred.expires_at) : null;
+      const isActive = !cred.revoked && (!expiresAt || expiresAt > new Date());
+
       row.innerHTML = `
         <td>${cred.username}</td>
-        <td>${cred.password || '********'}</td>
+        <td>********</td>
         <td>${new Date(cred.created_at).toLocaleDateString()}</td>
-        <td>${cred.expires_at ? new Date(cred.expires_at).toLocaleDateString() : 'Never'}</td>
-        <td>${getTimeRemaining(cred.expires_at)}</td>
+        <td>${expiresAt ? expiresAt.toLocaleDateString() : 'Never'}</td>
+        <td>${isActive ? 'Active' : 'Inactive'}</td>
         <td>
-          <button class="btn btn-sm ${cred.isActive ? 'btn-success' : 'btn-danger'}" 
+          <button class="btn btn-sm ${isActive ? 'btn-danger' : 'btn-success'}" 
             data-action="toggle" data-username="${cred.username}">
-            ${cred.isActive ? 'Active' : 'Inactive'}
+            ${isActive ? 'Revoke' : 'Activate'}
           </button>
           <button class="btn btn-sm btn-primary ms-1" 
             data-action="extend" data-username="${cred.username}">
@@ -103,204 +328,140 @@ async function updateCredentialsList() {
           </button>
         </td>
       `;
-      elements.credentialsList.appendChild(row);
+      tbody.appendChild(row);
     });
-    
-    // Add event listeners to buttons
+
     document.querySelectorAll('[data-action="toggle"]').forEach(btn => {
       btn.addEventListener('click', () => toggleCredential(btn.dataset.username));
     });
-    
+
     document.querySelectorAll('[data-action="extend"]').forEach(btn => {
       btn.addEventListener('click', () => extendCredential(btn.dataset.username));
     });
-    
+
   } catch (err) {
     showToast(err.message, 'danger');
+    console.error('Credentials fetch error:', err);
   }
 }
 
-// Sort by expiry date (soonest first)
-const sortedCredentials = Object.entries(credentialsData)
-  .sort((a, b) => new Date(a[1].expiresAt) - new Date(b[1].expiresAt));
+// Toggle credential status
+async function toggleCredential(username) {
+  try {
+    const btn = document.querySelector(`[data-action="toggle"][data-username="${username}"]`);
+    const revoke = btn.textContent.trim() === 'Revoke';
 
-if (sortedCredentials.length === 0) {
-  elements.credentialsList.innerHTML = `
-    <tr>
-      <td colspan="6" class="text-center py-4 text-muted">
-        No credentials generated yet
-      </td>
-    </tr>
-  `;
-  return;
-}
+    const response = await fetch('/toggle-credential', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ username, revoke })
+    });
 
-sortedCredentials.forEach(([username, cred]) => {
-  const row = document.createElement('tr');
-  row.innerHTML = `
-    <td>${username}</td>
-    <td>${cred.password}</td>
-    <td>${new Date(cred.generatedAt).toLocaleDateString()}</td>
-    <td>${new Date(cred.expiresAt).toLocaleDateString()}</td>
-    <td>${getTimeRemaining(cred.expiresAt)}</td>
-    <td>
-      <button class="btn btn-sm ${cred.isActive ? 'btn-success' : 'btn-danger'}" 
-        data-action="toggle" data-username="${username}">
-        ${cred.isActive ? 'Active' : 'Banned'}
-      </button>
-      <button class="btn btn-sm btn-primary ms-1" 
-        data-action="extend" data-username="${username}">
-        <i class="fas fa-plus"></i> 1 Week
-      </button>
-    </td>
-  `;
-  elements.credentialsList.appendChild(row);
-});
-
-// Add event listeners to buttons
-document.querySelectorAll('[data-action="toggle"]').forEach(btn => {
-  btn.addEventListener('click', () => toggleCredential(btn.dataset.username));
-});
-
-document.querySelectorAll('[data-action="extend"]').forEach(btn => {
-  btn.addEventListener('click', () => extendCredential(btn.dataset.username));
-});
-
-// Toggle credential active status
-function toggleCredential(username) {
-  if (credentialsData[username]) {
-    credentialsData[username].isActive = !credentialsData[username].isActive;
-    localStorage.setItem('credentials', JSON.stringify(credentialsData));
-    updateCredentialsList();
+    const data = await response.json();
+    if (data.success) {
+      showToast(`Credential ${username} ${revoke ? 'revoked' : 'activated'}`, 'success');
+      await fetchAndDisplayCredentials();
+    } else {
+      throw new Error(data.error || 'Failed to toggle credential');
+    }
+  } catch (err) {
+    showToast(err.message, 'danger');
+    console.error('Toggle credential error:', err);
   }
 }
 
 // Extend credential expiry
-function extendCredential(username) {
-  if (credentialsData[username]) {
-    const newExpiry = new Date(credentialsData[username].expiresAt);
-    newExpiry.setDate(newExpiry.getDate() + 7); // Add 1 week
-    
-    credentialsData[username].expiresAt = newExpiry.toISOString();
-    localStorage.setItem('credentials', JSON.stringify(credentialsData));
-    updateCredentialsList();
-    
-    showToast(`Extended expiry for ${username} by 1 week`, 'success');
+async function extendCredential(username) {
+  try {
+    const response = await fetch('/extend-credential', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ username, days: 7 })
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      showToast(`Extended ${username} by 7 days`, 'success');
+      await fetchAndDisplayCredentials();
+    } else {
+      throw new Error(data.error || 'Failed to extend credential');
+    }
+  } catch (err) {
+    showToast(err.message, 'danger');
+    console.error('Extend credential error:', err);
   }
 }
 
-// Helper function to generate random password
-function generatePassword() {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let password = '';
-  for (let i = 0; i < 10; i++) {
-    password += chars.charAt(Math.floor(Math.random() * chars.length));
+// Generate new credentials
+document.getElementById('generateCredentialsBtn').addEventListener('click', async () => {
+  const username = document.getElementById('generateUsername').value;
+  const tableBody = document.getElementById('credentialsList');
+
+  try {
+    const response = await fetch('/generate-credentials', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username })
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      const newRow = document.createElement('tr');
+      newRow.innerHTML = `
+        <td>${data.username}</td>
+        <td>${data.password}</td>
+        <td>${data.expires || 'N/A'}</td>
+        <td><span class="badge bg-success">Active</span></td>
+        <td><button class="btn btn-sm btn-outline-danger">Revoke</button></td>
+      `;
+      tableBody.innerHTML = ''; // Remove "No credentials" row if it exists
+      tableBody.appendChild(newRow);
+    } else {
+      alert('Error generating credentials');
+    }
+  } catch (err) {
+    console.error('Request failed:', err);
+    alert('Failed to connect to server or parse response.');
   }
-  return password;
-}
+});
 
-// Calculate time remaining
-function getTimeRemaining(expiresAt) {
-  const now = new Date();
-  const expiry = new Date(expiresAt);
-  const diff = expiry - now;
-  
-  if (diff <= 0) return 'Expired';
-  
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  return `${days}d ${hours}h`;
-}
-
-// Auto-refresh credentials list
-function startCredentialsTimer() {
-  // Clear existing interval if any
-  if (window.credentialsRefreshInterval) {
-    clearInterval(window.credentialsRefreshInterval);
-  }
-  
-  // Update every minute
-  window.credentialsRefreshInterval = setInterval(() => {
-    updateCredentialsList();
-  }, 60000);
-}
-
-// Admin logout
-function handleAdminLogout() {
-  elements.adminLoginForm.style.display = 'block';
-  elements.adminPanel.style.display = 'none';
-  elements.adminPasswordInput.value = '';
-  
-  // Clear refresh interval
-  if (window.credentialsRefreshInterval) {
-    clearInterval(window.credentialsRefreshInterval);
-  }
-}
-
-// Event Listeners
-elements.adminLoginBtn.addEventListener('click', handleAdminLogin);
-elements.adminLogoutBtn.addEventListener('click', handleAdminLogout);
-elements.generateCredentialsBtn.addEventListener('click', generateCredentials);
-
-// User authentication
-function validateUserCredentials(username, password) {
-  const cred = credentialsData[username];
-  if (!cred) return false;
-  
-  const now = new Date();
-  const expiry = new Date(cred.expiresAt);
-  
-  return (
-    cred.password === password && 
-    now < expiry && 
-    cred.isActive === true
-  );
-}
-
-// Initialize admin panel
-if (elements.adminModal) {
-  elements.adminModal.addEventListener('show.bs.modal', () => {
-    elements.adminLoginForm.style.display = 'block';
-    elements.adminPanel.style.display = 'none';
-    elements.adminPasswordInput.value = '';
-  });
-}
-
-// Toast notification
+// Show toast notification
 function showToast(message, type = 'success') {
-  const toastContainer = document.querySelector('.toast-container') || document.body;
-  const toastId = `toast-${Date.now()}`;
-  
-  const toast = document.createElement('div');
-  toast.id = toastId;
-  toast.className = `toast show align-items-center text-bg-${type}`;
-  toast.setAttribute('role', 'alert');
-  toast.setAttribute('aria-live', 'assertive');
-  toast.setAttribute('aria-atomic', 'true');
-  toast.innerHTML = `
-    <div class="d-flex">
-      <div class="toast-body">
-        <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} me-2"></i>
-        ${message}
+  const toastId = 'toast-' + Date.now();
+  const toastHTML = `
+    <div id="${toastId}" class="toast show align-items-center text-bg-${type}" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body">
+          <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} me-2"></i>
+          ${message}
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
       </div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
     </div>
   `;
-  
-  toastContainer.appendChild(toast);
-  
-  // Auto-remove after 5 seconds
+
+  const container = document.querySelector('.toast-container') || document.body;
+  container.insertAdjacentHTML('beforeend', toastHTML);
+
   setTimeout(() => {
-    toast.remove();
+    const toast = document.getElementById(toastId);
+    if (toast) {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    }
   }, 5000);
 }
 
-const socket = io();
-let socketId = null;
-let isStopped = false;
-let extractedNumbers = [];
-let isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
-let storedUsername = localStorage.getItem('username') || '';
+// Initialize admin panel when modal is shown
+if (document.getElementById('adminModal')) {
+  document.getElementById('adminModal').addEventListener('show.bs.modal', () => {
+    elements.adminLoginForm.style.display = 'block';
+    elements.adminPanel.style.display = 'none';
+    document.getElementById('adminPassword').value = '';
+  });
+}
 
 const apiMap = { 
   yellowpages: '/scrape-yellowpages',
@@ -335,12 +496,6 @@ const apiMap = {
   localstack: '/scrape-localstack'
 };
 
-// Initialize UI
-updateUI();
-if (isAuthenticated) {
-  elements.signInBtn.textContent = `Sign Out (${storedUsername})`;
-}
-
 // Initialize form visibility and depth slider
 handleFormVisibility();
 if (elements.depthInput) {
@@ -348,12 +503,6 @@ if (elements.depthInput) {
   updateDepthValue();
 }
 
-let existingNumbers = new Set();
-
-// Socket Events
-socket.on('connect', () => {
-  socketId = socket.id;
-});
 
 socket.on('phoneNumber', (data) => {
   if (!isStopped && data?.number && !existingNumbers.has(data.number)) {
@@ -373,6 +522,10 @@ socket.on('progress', (percent) => {
 
 // Functions
 function handleFormVisibility() {
+  const sourceSelect = document.getElementById('source');
+  const searchTermLabel = document.getElementById('searchTermLabel');
+  const pagesInput = document.getElementById('pages');
+
   const source = sourceSelect.value;
   const isPersonal = source === 'personal';
   const isCustom = source === 'custom';
@@ -386,18 +539,54 @@ function handleFormVisibility() {
   if (searchTermLabel) {
     searchTermLabel.textContent = isPersonal ? 'Person Name' : 'Search Term';
   }
+
   if (pagesInput) {
-    pagesInput.max = isPersonal ? '1000' : '1000';
+    pagesInput.max = isPersonal ? '1000' : '50'; // Adjust this as you like
   }
 }
 
 function updateDepthValue() {
-  if (depthValue && depthInput) {
-    depthValue.textContent = `${depthInput.value} page${depthInput.value > 1 ? 's' : ''}`;
+  const depthInput = document.getElementById('depthPages');
+  const depthValue = document.getElementById('depthValue');
+
+  if (depthInput && depthValue) {
+    const value = depthInput.value;
+    depthValue.textContent = `${value} page${value > 1 ? 's' : ''}`;
   }
 }
 
+function initExtractionForm() {
+  const sourceSelect = document.getElementById('source');
+  const depthInput = document.getElementById('depthPages');
+  const extractForm = document.getElementById('extractForm');
+
+  if (sourceSelect) {
+    sourceSelect.addEventListener('change', handleFormVisibility);
+    handleFormVisibility(); // Call once to set initial state
+  }
+
+  if (depthInput) {
+    depthInput.addEventListener('input', updateDepthValue);
+    updateDepthValue(); // Call once to set initial value
+  }
+
+  if (extractForm) {
+    extractForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      // Add your extraction logic here
+      console.log('Extraction submitted');
+    });
+  }
+}
+
+// Make sure DOM don ready before calling
+document.addEventListener('DOMContentLoaded', initExtractionForm);
+
+
 function showNumber(number, source) {
+  const resultTableBody = document.getElementById('resultTableBody');
+  
+  // Clear "no results" message if present
   if (resultTableBody.querySelector('td[colspan]')) {
     resultTableBody.innerHTML = '';
   }
@@ -415,6 +604,7 @@ function showNumber(number, source) {
   `;
   resultTableBody.appendChild(row);
 
+  // Auto-scroll to bottom
   const tableResponsive = document.querySelector('.table-responsive');
   if (tableResponsive) {
     tableResponsive.scrollTop = tableResponsive.scrollHeight;
@@ -422,31 +612,17 @@ function showNumber(number, source) {
 }
 
 function updateResultCount() {
-  if (resultCount) {
-    const count = extractedNumbers.length;
-    resultCount.textContent = `${count} number${count !== 1 ? 's' : ''} extracted`;
-  }
-}
-
-function updateUI() {
-  if (isAuthenticated) {
-    if (extractBtn) extractBtn.disabled = false;
-    if (stopBtn) stopBtn.disabled = false;
-    document.querySelector('.disclaimer')?.style?.setProperty('display', 'none', 'important');
-    if (statusText) statusText.textContent = 'Ready to extract';
-  } else {
-    if (extractBtn) extractBtn.disabled = true;
-    if (stopBtn) stopBtn.disabled = true;
-    document.querySelector('.disclaimer')?.style?.setProperty('display', 'block', 'important');
-    if (statusText) statusText.textContent = 'Please sign in to extract';
+  if (elements.resultCount && elements.resultTableBody) {
+    const count = elements.resultTableBody.children.length;
+    elements.resultCount.textContent = `${count} number${count !== 1 ? 's' : ''} extracted`;
   }
 }
 
 function resetExtraction() {
   existingNumbers.clear();
   extractedNumbers = [];
-  if (resultTableBody) {
-    resultTableBody.innerHTML = `
+  if (elements.resultTableBody) {
+    elements.resultTableBody.innerHTML = `
       <tr>
         <td colspan="7" class="text-center py-5 text-muted">
           <i class="fas fa-inbox fa-3x mb-3"></i><br>
@@ -467,65 +643,70 @@ function stopLoading() {
   if (statusText) statusText.textContent = isAuthenticated ? 'Ready' : 'Please sign in to extract';
 }
 
+// Update handleFormSubmit function
 async function handleFormSubmit(e) {
   e.preventDefault();
-  if (!isAuthenticated) {
-    alert('Please sign in before extracting.');
+  if (!currentUser) {
+    showToast('Please sign in before extracting.', 'danger');
     return;
   }
 
   resetExtraction();
   startLoading();
+  isStopped = false;
 
-  const source = sourceSelect.value;
+  const source = elements.sourceSelect.value;
   const endpoint = apiMap[source];
-  let body = {};
-
+  
   try {
-    if (source === 'custom') {
-      const url = customUrlInput.value.trim();
-      if (!url) throw new Error('Enter a valid URL.');
-      body = { url, depth: parseInt(depthInput.value) || 1, socketId };
-    } else if (source === 'personal') {
-      const name = searchTermInput.value.trim();
-      if (!name) throw new Error('Enter a name.');
-      body = { name, socketId };
-    } else {
-      const searchTerm = searchTermInput.value.trim();
-      const location = locationInput.value.trim();
-      if (!searchTerm || !location) throw new Error('Enter search term and location.');
-      body = { searchTerm, location, pages: parseInt(pagesInput.value) || 1, socketId };
-    }
+    const requestData = {
+      socketId: socket.id,
+      searchTerm: elements.searchTermInput.value.trim(),
+      location: elements.locationInput.value.trim(),
+      pages: parseInt(elements.pagesInput.value) || 1
+    };
 
-    const res = await fetch(endpoint, {
+    // Add error handling for the fetch request
+    const response = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
+      body: JSON.stringify(requestData)
     });
 
-    if (!res.ok) {
-      const error = await res.json().catch(() => ({ error: 'Server error' }));
-      throw new Error(error.error || 'Request failed');
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Request failed');
     }
 
-    const data = await res.json();
-    if (!data.success) throw new Error(data.error || 'Unknown error');
-    
-    stopLoading();
-    if (statusText) statusText.textContent = 'Extraction completed';
+    showToast(`${source} extraction started`, 'success');
   } catch (err) {
+    console.error('Extraction error:', err);
+    showToast(err.message, 'danger');
+  } finally {
+    elements.extractBtn.disabled = false;
+    elements.stopBtn.disabled = true;
     stopLoading();
-    if (statusText) statusText.textContent = 'Error occurred during extraction';
-    alert(`Error: ${err.message}`);
   }
 }
 
 function stopExtraction() {
   isStopped = true;
-  stopLoading();
   socket.emit('cancelScrape');
-  if (statusText) statusText.textContent = 'Extraction stopped';
+  
+  // UI updates
+  elements.extractBtn.disabled = false;
+  elements.stopBtn.disabled = true;
+  elements.statusText.textContent = 'Extraction stopped';
+  showToast('Extraction stopped', 'info');
+  
+  // If you have a progress bar
+  if (elements.extractionProgress) {
+    elements.extractionProgress.style.width = '0%';
+  }
 }
+
+// Add stop button event listener
+elements.stopBtn?.addEventListener('click', stopExtraction);
 
 function saveNumbers() {
   if (extractedNumbers.length === 0) {
@@ -544,111 +725,6 @@ function saveNumbers() {
   URL.revokeObjectURL(url);
 }
 
-function handleSignIn() {
-  if (isAuthenticated) {
-    // Sign out logic
-    isAuthenticated = false;
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('username');
-    document.cookie = 'jwt=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-    elements.signInBtn.textContent = 'Sign In';
-    updateUI();
-    showToast('Signed out successfully', 'success');
-  } else {
-    new bootstrap.Modal(document.getElementById('signInModal')).show();
-  }
-}
-
-async function verifyNumbers() {
-  if (extractedNumbers.length === 0) {
-    alert('No numbers to verify.');
-    return;
-  }
-
-  try {
-    const numbers = extractedNumbers.map(item => item.number);
-    const res = await fetch('/verify-numbers', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ numbers })
-	  credentials: 'include'
-    });
-
-    const data = await res.json();
-    
-    if (data.success) {
-      data.results.forEach((result, i) => {
-        const row = resultTableBody.children[i];
-        if (row) {
-          row.cells[3].textContent = result.type || 'Unknown';
-          row.cells[4].textContent = result.country || 'Unknown';
-          row.cells[5].textContent = result.carrier || 'Unknown';
-          row.cells[6].className = result.valid ? 'text-success' : 'text-danger';
-          row.cells[6].textContent = result.valid ? 'Valid' : 'Invalid';
-          row.dataset.verified = result.valid;
-        }
-      });
-      alert('Verification completed!');
-    } else {
-      throw new Error(data.error || 'Failed to verify numbers');
-    }
-  } catch (err) {
-    console.error('Verification error:', err);
-    alert('Error verifying numbers: ' + err.message);
-  }
-}
-
-// Admin Login Functionality
-async function handleAdminLogin() {
-  try {
-    const response = await fetch('/admin-login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password: elements.adminPasswordInput.value })
-	  credentials: 'include'
-    });
-
-    const data = await response.json();
-
-    if (response.ok && data.success) {
-      document.cookie = `jwt=${data.token}; path=/; ${process.env.NODE_ENV === 'production' ? 'Secure; SameSite=Strict' : ''}`;
-      document.getElementById('adminLoginForm').style.display = 'none';
-      document.getElementById('adminPanel').style.display = 'block';
-      updateCredentialsList();
-      startCredentialsTimer();
-      showToast('Admin login successful', 'success');
-    } else {
-      showToast('Invalid admin password', 'danger');
-    }
-  } catch (err) {
-    console.error('Admin login error:', err);
-    showToast('Login failed. Please try again.', 'danger');
-  }
-}
-
-
-function handleAdminLogout() {
-  document.getElementById('adminLoginForm').style.display = 'block';
-  document.getElementById('adminPanel').style.display = 'none';
-  clearInterval(adminRefreshInterval);
-}
-
-function generateCredentials() {
-  const username = generateUsername.value.trim() || `user_${Math.random().toString(36).substr(2, 6)}`;
-  const password = generatePassword();
-  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-  
-  const credential = {
-    username,
-    password,
-    expiresAt: expiresAt.toISOString(),
-    generatedAt: new Date().toISOString()
-  };
-  
-  credentialsData[username] = credential;
-  localStorage.setItem('credentials', JSON.stringify(credentialsData));
-  updateCredentialsList();
-}
 
 function updateCredentialsList() {
   if (!credentialsList) return;
@@ -702,39 +778,6 @@ function generatePassword() {
   return password;
 }
 
-async function handleUserLogin(e) {
-  e.preventDefault();
-  const username = elements.usernameInput.value.trim();
-  const password = elements.passwordInput.value;
-
-  try {
-    const response = await fetch('/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
-	  credentials: 'include'
-    });
-
-    const data = await response.json();
-    
-    if (data.success) {
-      isAuthenticated = true;
-      storedUsername = username;
-      localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('username', username);
-      
-      elements.signInBtn.textContent = `Sign Out (${username})`;
-      updateUI();
-      
-      bootstrap.Modal.getInstance(document.getElementById('signInModal')).hide();
-      showToast('Signed in successfully!', 'success');
-    } else {
-      throw new Error(data.error || 'Invalid credentials');
-    }
-  } catch (err) {
-    showToast(err.message, 'danger');
-  }
-}
 
 function validateUserCredentials(username, password) {
   const cred = credentialsData[username];
@@ -773,86 +816,17 @@ if (saveProxiesBtn) {
 }
 
 function isValidProxy(proxy) {
-  const proxyRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?):\d{1,5}(?::[^:]+:[^:]+)?$/;
+  if (!proxy) return false;
   
+  // Basic format validation
+  const proxyRegex = /^(\d{1,3}\.){3}\d{1,3}:\d{1,5}(:.+:.+)?$/;
   if (!proxyRegex.test(proxy)) return false;
-  if (proxy.includes('127.0.0.1') || proxy.includes('localhost')) return false;
-
+  
+  // Validate IP parts
   const ip = proxy.split(':')[0];
   const ipParts = ip.split('.');
   return ipParts.every(part => {
     const num = parseInt(part, 10);
     return num >= 0 && num <= 255;
   });
-}
-
-// Toast notification system
-function showToast(message, type = 'success') {
-  const toastId = 'toast-' + Date.now();
-  const toastHTML = `
-    <div id="${toastId}" class="toast show align-items-center text-bg-${type}" role="alert" aria-live="assertive" aria-atomic="true">
-      <div class="d-flex">
-        <div class="toast-body">
-          <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} me-2"></i>
-          ${message}
-        </div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-      </div>
-    </div>
-  `;
-  
-  const container = document.querySelector('.toast-container') || document.body;
-  container.insertAdjacentHTML('beforeend', toastHTML);
-  
-  setTimeout(() => {
-    const toast = document.getElementById(toastId);
-    if (toast) {
-      toast.classList.remove('show');
-      setTimeout(() => toast.remove(), 300);
-    }
-  }, 3000);
-}
-
-async function toggleCredential(username) {
-  try {
-    const response = await fetch('/toggle-credential', {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${getCookie('jwt')}`
-      },
-      body: JSON.stringify({ username, revoke: true }) // Toggle logic needs to check current state
-	  credentials: 'include'
-    });
-    
-    const data = await response.json();
-    if (!data.success) throw new Error(data.error || 'Failed to toggle credential');
-    
-    showToast(`Credential ${username} updated`, 'success');
-    updateCredentialsList();
-  } catch (err) {
-    showToast(err.message, 'danger');
-  }
-}
-
-async function extendCredential(username) {
-  try {
-    const response = await fetch('/extend-credential', {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${getCookie('jwt')}`
-      },
-      body: JSON.stringify({ username, days: 7 })
-	  credentials: 'include'
-    });
-    
-    const data = await response.json();
-    if (!data.success) throw new Error(data.error || 'Failed to extend credential');
-    
-    showToast(`Credential ${username} extended by 7 days`, 'success');
-    updateCredentialsList();
-  } catch (err) {
-    showToast(err.message, 'danger');
-  }
 }
