@@ -132,11 +132,11 @@ async function checkAuth() {
       const data = await response.json();
       if (data.success && data.user) {
         currentUser = data.user;
-        updateUI();
+        updateUI(); // e.g. show/hide admin panel
         return true;
       }
     }
-    updateUI(); // ensure UI updates even if not logged in
+    updateUI(); // unauthenticated state
     return false;
   } catch (err) {
     console.error('Auth check failed:', err);

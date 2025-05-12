@@ -24,12 +24,16 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import cookieParser from 'cookie-parser';
 
+app.set('trust proxy', true);
 
 let mongoDb;
 
 // For __dirname equivalent
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
 
 // Activate Puppeteer stealth plugin
 puppeteer.use(StealthPlugin());
@@ -63,7 +67,9 @@ const args = [
   '--disable-setuid-sandbox',
   '--no-first-run',
   '--no-sandbox',
-  '--no-zygote'
+  '--no-zygote',
+  '--disable-software-rasterizer',
+'--disable-features=VizDisplayCompositor'
 ];
 
 // Database connections
@@ -182,7 +188,9 @@ app.use((err, req, res, next) => {
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false
 });
 
 const scrapeLimiter = rateLimit({
@@ -292,11 +300,19 @@ async function startBrowser(socketId, attempt = 1) {
     : args;
 
   try {
-    const browser = await puppeteer.launch({ 
-      executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+    const browser = await puppeteer.launch({
       headless: true,
-      args: argsWithProxy,
-      timeout: 30000
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
+        '--no-zygote',
+        '--single-process',
+        '--disable-gpu'
+      ],
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium-browser'
     });
     
     logger.info('Browser launched successfully');
@@ -346,16 +362,15 @@ app.post('/admin-login', async (req, res) => {
 
 // Add this to your existing app.js
 app.get('/check-auth', async (req, res) => {
-  const token = req.cookies.jwt;
+  const token = req.cookies?.jwt;
   if (!token) {
     return res.status(401).json({ success: false, error: 'Not authenticated' });
   }
 
   try {
     const decoded = jwt.verify(token, jwtConfig.secret);
-    
-    // Check if user exists in database
-    const user = await mongoDb.collection('users').findOne({ 
+
+    const user = await mongoDb.collection('users').findOne({
       username: decoded.username,
       revoked: { $ne: true },
       $or: [
@@ -368,12 +383,12 @@ app.get('/check-auth', async (req, res) => {
       return res.status(401).json({ success: false, error: 'Invalid or expired user' });
     }
 
-    res.json({ 
-      success: true, 
-      user: { 
+    return res.json({
+      success: true,
+      user: {
         username: user.username,
-        role: user.role 
-      } 
+        role: user.role || 'user'
+      }
     });
   } catch (err) {
     return res.status(401).json({ success: false, error: 'Invalid or expired token' });
@@ -462,6 +477,7 @@ async function solveCaptcha(page) {
 
 // Generic scraper helper
 async function genericScraper({ searchUrl, sourceName, searchTerm, location, pages, socketId, customExtraction }) {
+  const seenNumbers = new Set();
   logger.info(`Starting ${sourceName} scrape`, { searchTerm, location, pages });
   
   const browser = await startBrowser(socketId);
