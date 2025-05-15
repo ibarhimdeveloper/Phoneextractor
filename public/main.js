@@ -4,76 +4,18 @@ const socket = io({
   reconnectionDelay: 1000,
   reconnectionDelayMax: 5000,
   timeout: 20000,
-  transports: ['websocket'] // Force WebSocket transport
+  transports: ['websocket']
 });
 
-// Add connection status logging
-socket.on('connect', () => {
-  console.log('Connected to server with socket ID:', socket.id);
-  socketId = socket.id;
-});
-
-socket.on('disconnect', () => {
-  console.log('Disconnected from server');
-});
-
-socket.on('connect_error', (err) => {
-  console.error('Socket connection error:', err);
-  showToast('Connection error - trying to reconnect...', 'warning');
-});
-
-socket.on('extraction-result', (data) => {
-  const tbody = document.getElementById('resultTableBody');
-  const row = document.createElement('tr');
-  row.setAttribute('data-number', data.phone);
-  row.innerHTML = `
-    <td>${tbody.children.length + 1}</td>
-    <td>${data.phone}</td>
-    <td>${data.source}</td>
-    <td>${data.type}</td>
-    <td>${data.country}</td>
-    <td>${data.carrier}</td>
-    <td class="text-success">${data.status}</td>
-  `;
-  tbody.appendChild(row);
-
-  document.getElementById('resultCount').textContent = `${tbody.children.length} numbers`;
-});
-
-// Socket events for extraction
-socket.on('phoneNumber', (data) => {
-  if (!isStopped && data?.number && !existingNumbers.has(data.number)) {
-    existingNumbers.add(data.number);
-    const { number, source } = data;
-    showNumber(number, source);
-    extractedNumbers.push({ number, source });
-    updateResultCount();
-  }
-});
-
-socket.on('progress', (percent) => {
-  if (elements.extractionProgress) {
-    elements.extractionProgress.style.width = `${percent}%`;
-    if (elements.statusText) {
-      elements.statusText.textContent = `Extracting... ${percent}%`;
-    }
-  }
-});
-
-let currentUser = null;
-let socketId = null;
-socket.on('connect', () => {
-  console.log('Connected to server with socket ID:', socket.id);
-  socketId = socket.id;
-  // Refresh credentials if in admin panel
-  if (document.getElementById('adminPanel')?.style.display === 'block') {
-    fetchAndDisplayCredentials();
-  }
-});
-let isStopped = false;
-let extractedNumbers = [];
-let existingNumbers = new Set();
-let isAuthenticated = false;
+// App state
+const appState = {
+  isAuthenticated: false,
+  currentUser: null,
+  socketId: null,
+  isExtracting: false,
+  extractedNumbers: [],
+  existingNumbers: new Set()
+};
 
 // DOM Elements
 const elements = {
@@ -100,369 +42,23 @@ const elements = {
   resultCount: document.getElementById('resultCount'),
   statusText: document.getElementById('statusText'),
   extractionProgress: document.getElementById('extractionProgress'),
-  saveToNotepad: document.getElementById('saveToNotepad')
+  saveToNotepad: document.getElementById('saveToNotepad'),
+  submitButton: document.getElementById('submitButton'),
+  loadingSpinner: document.getElementById('loadingOverlay'),
+  progressContainer: document.querySelector('.progressContainer'),
+  progressBar: document.getElementById('extractionProgress'),
+  progressText: document.querySelector('.progressText'),
+  extractionStatus: document.getElementById('statusText')
 };
 
-// Initialize the app
-document.addEventListener('DOMContentLoaded', async () => {
-  await checkAuth();
-  setupEventListeners();
-  
-  // Initialize form visibility
-  handleFormVisibility();
-  
-  // Initialize depth slider
-  if (elements.depthInput) {
-    elements.depthInput.addEventListener('input', updateDepthValue);
-    updateDepthValue();
-  }
-  
-  // Initialize extraction form
-  initExtractionForm();
-});
-
-// Check authentication status
-async function checkAuth() {
-  try {
-    const response = await fetch('/check-auth', {
-      credentials: 'include'
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      if (data.success && data.user) {
-        currentUser = data.user;
-        updateUI(); // e.g. show/hide admin panel
-        return true;
-      }
-    }
-    updateUI(); // unauthenticated state
-    return false;
-  } catch (err) {
-    console.error('Auth check failed:', err);
-    updateUI();
-    return false;
+// Verify all elements exist
+for (const [key, element] of Object.entries(elements)) {
+  if (!element) {
+    console.error(`Element ${key} not found`);
   }
 }
 
-// Update UI based on auth state
-function updateUI() {
-  const isLoggedIn = !!currentUser;
-  elements.extractBtn.disabled = !isLoggedIn;
-  elements.stopBtn.disabled = !isLoggedIn;
-
-  elements.signInBtn.innerHTML = isLoggedIn
-    ? `<i class="fas fa-sign-out-alt me-2"></i> Sign Out (${currentUser.username})`
-    : '<i class="fas fa-sign-in-alt me-2"></i> Sign In';
-}
-
-// Setup event listeners
-function setupEventListeners() {
-  // Sign in/out
-  elements.signInBtn?.addEventListener('click', async () => {
-    if (currentUser) {
-      await handleSignOut();
-    } else {
-      new bootstrap.Modal(document.getElementById('signInModal')).show();
-    }
-  });
-}
-  // Sign in form submission
-  elements.signInForm?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    await handleUserLogin(e);
-  });
-
-  // Admin login
-  elements.adminLoginBtn?.addEventListener('click', handleAdminLogin);
-
-  // Admin logout
-  elements.adminLogoutBtn?.addEventListener('click', handleAdminLogout);
-  
-  // Add these if missing
-  elements.extractForm?.addEventListener('submit', handleFormSubmit);
-  elements.stopBtn?.addEventListener('click', stopExtraction);
-
-// Handle user login
-async function handleUserLogin(e) {
-  const username = elements.usernameInput.value;
-  const password = elements.passwordInput.value;
-
-  try {
-    const response = await fetch('/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ username, password })
-    });
-
-    const data = await response.json();
-    if (data.success) {
-      currentUser = { username: data.username };
-      showToast('Signed in successfully!', 'success');
-      updateUI();
-      bootstrap.Modal.getInstance(document.getElementById('signInModal')).hide();
-    } else {
-      showToast(data.error || 'Invalid credentials', 'danger');
-    }
-  } catch (err) {
-    showToast('Login failed', 'danger');
-    console.error('Login error:', err);
-  }
-}
-
-// Handle sign out
-async function handleSignOut() {
-  try {
-    await fetch('/logout', {
-      method: 'POST',
-      credentials: 'include'
-    });
-
-    currentUser = null;
-    updateUI();
-    showToast('Signed out successfully', 'success');
-  } catch (err) {
-    showToast('Logout failed', 'danger');
-    console.error('Logout error:', err);
-  }
-}
-
-// Admin login
-async function handleAdminLogin() {
-  const password = document.getElementById('adminPassword').value;
-
-  try {
-    const response = await fetch('/admin-login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ password })
-    });
-
-    const data = await response.json();
-    if (data.success) {
-      elements.adminLoginForm.style.display = 'none';
-      elements.adminPanel.style.display = 'block';
-      await fetchAndDisplayCredentials();
-      showToast('Admin login successful', 'success');
-    } else {
-      throw new Error(data.error || 'Wrong password');
-    }
-  } catch (err) {
-    showToast(err.message, 'danger');
-    console.error('Admin login error:', err);
-  }
-}
-
-// Update handleAdminLogout function
-async function handleAdminLogout() {
-  try {
-    await fetch('/logout', {
-      method: 'POST',
-      credentials: 'include'
-    });
-    elements.adminPanel.style.display = 'none';
-    elements.adminLoginForm.style.display = 'block';
-    document.getElementById('adminPassword').value = '';
-    
-    // Clear credentials list
-    const tbody = document.getElementById('credentialsList');
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="5" class="text-center py-4 text-muted">
-          No credentials generated yet
-        </td>
-      </tr>
-    `;
-    showToast('Admin logged out', 'info');
-  } catch (err) {
-    showToast('Logout failed', 'danger');
-    console.error('Admin logout error:', err);
-  }
-}
-
-// Fetch and display credentials
-async function fetchAndDisplayCredentials() {
-  try {
-    const response = await fetch('/get-credentials', {
-      credentials: 'include'
-    });
-    const data = await response.json();
-
-    if (!data.success) throw new Error(data.error || 'Failed to fetch credentials');
-
-    const tbody = document.getElementById('credentialsList');
-    tbody.innerHTML = '';
-
-    if (data.credentials.length === 0) {
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="6" class="text-center py-4 text-muted">
-            No credentials generated yet
-          </td>
-        </tr>
-      `;
-      return;
-    }
-
-    data.credentials.forEach(cred => {
-      const row = document.createElement('tr');
-      const expiresAt = cred.expires_at ? new Date(cred.expires_at) : null;
-      const isActive = !cred.revoked && (!expiresAt || expiresAt > new Date());
-
-      row.innerHTML = `
-        <td>${cred.username}</td>
-        <td>********</td>
-        <td>${new Date(cred.created_at).toLocaleDateString()}</td>
-        <td>${expiresAt ? expiresAt.toLocaleDateString() : 'Never'}</td>
-        <td>${isActive ? 'Active' : 'Inactive'}</td>
-        <td>
-          <button class="btn btn-sm ${isActive ? 'btn-danger' : 'btn-success'}" 
-            data-action="toggle" data-username="${cred.username}">
-            ${isActive ? 'Revoke' : 'Activate'}
-          </button>
-          <button class="btn btn-sm btn-primary ms-1" 
-            data-action="extend" data-username="${cred.username}">
-            <i class="fas fa-plus"></i> Extend
-          </button>
-        </td>
-      `;
-      tbody.appendChild(row);
-    });
-
-    document.querySelectorAll('[data-action="toggle"]').forEach(btn => {
-      btn.addEventListener('click', () => toggleCredential(btn.dataset.username));
-    });
-
-    document.querySelectorAll('[data-action="extend"]').forEach(btn => {
-      btn.addEventListener('click', () => extendCredential(btn.dataset.username));
-    });
-
-  } catch (err) {
-    showToast(err.message, 'danger');
-    console.error('Credentials fetch error:', err);
-  }
-}
-
-// Toggle credential status
-async function toggleCredential(username) {
-  try {
-    const btn = document.querySelector(`[data-action="toggle"][data-username="${username}"]`);
-    const revoke = btn.textContent.trim() === 'Revoke';
-
-    const response = await fetch('/toggle-credential', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ username, revoke })
-    });
-
-    const data = await response.json();
-    if (data.success) {
-      showToast(`Credential ${username} ${revoke ? 'revoked' : 'activated'}`, 'success');
-      await fetchAndDisplayCredentials();
-    } else {
-      throw new Error(data.error || 'Failed to toggle credential');
-    }
-  } catch (err) {
-    showToast(err.message, 'danger');
-    console.error('Toggle credential error:', err);
-  }
-}
-
-// Extend credential expiry
-async function extendCredential(username) {
-  try {
-    const response = await fetch('/extend-credential', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ username, days: 7 })
-    });
-
-    const data = await response.json();
-    if (data.success) {
-      showToast(`Extended ${username} by 7 days`, 'success');
-      await fetchAndDisplayCredentials();
-    } else {
-      throw new Error(data.error || 'Failed to extend credential');
-    }
-  } catch (err) {
-    showToast(err.message, 'danger');
-    console.error('Extend credential error:', err);
-  }
-}
-
-// Generate new credentials
-document.getElementById('generateCredentialsBtn').addEventListener('click', async () => {
-  const username = document.getElementById('generateUsername').value;
-  const tableBody = document.getElementById('credentialsList');
-
-  try {
-    const response = await fetch('/generate-credentials', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username })
-    });
-
-    const data = await response.json();
-    if (data.success) {
-      const newRow = document.createElement('tr');
-      newRow.innerHTML = `
-        <td>${data.username}</td>
-        <td>${data.password}</td>
-        <td>${data.expires || 'N/A'}</td>
-        <td><span class="badge bg-success">Active</span></td>
-        <td><button class="btn btn-sm btn-outline-danger">Revoke</button></td>
-      `;
-      tableBody.innerHTML = ''; // Remove "No credentials" row if it exists
-      tableBody.appendChild(newRow);
-    } else {
-      alert('Error generating credentials');
-    }
-  } catch (err) {
-    console.error('Request failed:', err);
-    alert('Failed to connect to server or parse response.');
-  }
-});
-
-// Show toast notification
-function showToast(message, type = 'success') {
-  const toastId = 'toast-' + Date.now();
-  const toastHTML = `
-    <div id="${toastId}" class="toast show align-items-center text-bg-${type}" role="alert" aria-live="assertive" aria-atomic="true">
-      <div class="d-flex">
-        <div class="toast-body">
-          <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} me-2"></i>
-          ${message}
-        </div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-      </div>
-    </div>
-  `;
-
-  const container = document.querySelector('.toast-container') || document.body;
-  container.insertAdjacentHTML('beforeend', toastHTML);
-
-  setTimeout(() => {
-    const toast = document.getElementById(toastId);
-    if (toast) {
-      toast.classList.remove('show');
-      setTimeout(() => toast.remove(), 300);
-    }
-  }, 5000);
-}
-
-// Initialize admin panel when modal is shown
-if (document.getElementById('adminModal')) {
-  document.getElementById('adminModal').addEventListener('show.bs.modal', () => {
-    elements.adminLoginForm.style.display = 'block';
-    elements.adminPanel.style.display = 'none';
-    document.getElementById('adminPassword').value = '';
-  });
-}
-
+// Source to API endpoint mapping
 const apiMap = { 
   yellowpages: '/scrape-yellowpages',
   yelp: '/scrape-yelp',
@@ -496,105 +92,411 @@ const apiMap = {
   localstack: '/scrape-localstack'
 };
 
-// Initialize form visibility and depth slider
-handleFormVisibility();
-if (elements.depthInput) {
-  elements.depthInput.addEventListener('input', updateDepthValue);
-  updateDepthValue();
-}
+// Source display names
+const sourceDisplayNames = {
+  yellowpages: 'Yellow Pages',
+  yelp: 'Yelp',
+  personal: 'Personal Search',
+  custom: 'Custom Website',
+  global: 'All Sources',
+  whitepages: 'White Pages',
+  linkedin: 'LinkedIn',
+  facebook: 'Facebook',
+  truepeoplesearch: 'TruePeopleSearch',
+  anywho: 'AnyWho',
+  spokeo: 'Spokeo',
+  fastpeoplesearch: 'FastPeopleSearch',
+  '411': '411',
+  usphonebook: 'USPhonebook',
+  radaris: 'Radaris',
+  zabasearch: 'ZabaSearch',
+  peoplefinders: 'PeopleFinders',
+  peekyou: 'PeekYou',
+  thatsthem: 'ThatsThem',
+  addresses: 'Addresses',
+  pipl: 'Pipl',
+  manta: 'Manta',
+  bbb: 'BBB',
+  hotfrog: 'Hotfrog',
+  foursquare: 'Foursquare',
+  brownbook: 'Brownbook',
+  cityfos: 'Cityfos',
+  cylex: 'Cylex',
+  merchantcircle: 'MerchantCircle',
+  localstack: 'Localstack'
+};
 
+// Initialize the app
+document.addEventListener('DOMContentLoaded', async () => {
+  await checkAuth();
+  setupEventListeners();
+  handleFormVisibility();
+  
+  if (elements.depthInput) {
+    elements.depthInput.addEventListener('input', updateDepthValue);
+    updateDepthValue();
+  }
+  
+  initExtractionForm();
+});
+
+// Socket.io events
+socket.on('connect', () => {
+  console.log('Socket connected:', socket.connected); // Should be true
+  appState.socketId = socket.id;
+  
+  if (document.getElementById('adminPanel')?.style.display === 'block') {
+    fetchAndDisplayCredentials();
+  }
+});
+
+socket.on('disconnect', () => {
+  console.log('Disconnected from server');
+});
+
+socket.on('connect_error', (err) => {
+  console.error('Socket connection error:', err);
+  showToast('Connection error - trying to reconnect...', 'warning');
+});
+
+socket.on('reconnect_attempt', () => {
+  console.log('Attempting reconnect...');
+});
 
 socket.on('phoneNumber', (data) => {
-  if (!isStopped && data?.number && !existingNumbers.has(data.number)) {
-    existingNumbers.add(data.number);
-    const { number, source } = data;
-    showNumber(number, source);
-    extractedNumbers.push({ number, source });
-    updateResultCount();
-  }
+  if (!appState.isExtracting || !data?.number || appState.existingNumbers.has(data.number)) return;
+  
+  appState.existingNumbers.add(data.number);
+  appState.extractedNumbers.push(data);
+  showNumber(data.number, data.source);
+  updateResultCount();
 });
 
 socket.on('progress', (percent) => {
-  if (extractionProgress) {
-    extractionProgress.style.width = `${percent}%`;
+  if (elements.extractionProgress) {
+    elements.extractionProgress.style.width = `${percent}%`;
+    if (elements.statusText) {
+      elements.statusText.textContent = `Extracting... ${percent}%`;
+    }
   }
 });
 
-// Functions
-function handleFormVisibility() {
-  const sourceSelect = document.getElementById('source');
-  const searchTermLabel = document.getElementById('searchTermLabel');
-  const pagesInput = document.getElementById('pages');
+socket.on('error', (message) => {
+  showToast(message, 'danger');
+  stopExtraction();
+});
 
-  const source = sourceSelect.value;
+// Auth functions
+async function checkAuth() {
+  try {
+    const response = await fetch('/check-auth', { credentials: 'include' });
+    
+    if (response.ok) {
+      const data = await response.json();
+      if (data.success) {
+        appState.isAuthenticated = true;
+        appState.currentUser = data.user;
+        updateUI();
+        return true;
+      }
+    }
+    
+    appState.isAuthenticated = false;
+    appState.currentUser = null;
+    updateUI();
+    return false;
+  } catch (err) {
+    console.error('Auth check failed:', err);
+    return false;
+  }
+}
+
+function updateUI() {
+  const { isAuthenticated, currentUser } = appState;
+  
+  if (elements.signInBtn) {
+    elements.signInBtn.innerHTML = isAuthenticated
+      ? `<i class="fas fa-sign-out-alt me-2"></i> Sign Out (${currentUser?.username || ''})`
+      : '<i class="fas fa-sign-in-alt me-2"></i> Sign In';
+  }
+  
+  if (elements.extractBtn) elements.extractBtn.disabled = !isAuthenticated;
+  if (elements.stopBtn) elements.stopBtn.disabled = !isAuthenticated;
+  
+  if (elements.statusText) {
+    elements.statusText.textContent = isAuthenticated 
+      ? 'Ready to extract' 
+      : 'Please sign in to extract';
+  }
+}
+
+// Setup event listeners
+function setupEventListeners() {
+  if (elements.signInBtn) {
+    elements.signInBtn.addEventListener('click', async () => {
+      if (appState.isAuthenticated) {
+        await handleSignOut();
+      } else {
+        new bootstrap.Modal(document.getElementById('signInModal')).show();
+      }
+    });
+  }
+
+  if (elements.signInForm) {
+    elements.signInForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await handleUserLogin(e);
+    });
+  }
+
+  if (elements.adminLoginBtn) {
+    elements.adminLoginBtn.addEventListener('click', handleAdminLogin);
+  }
+
+  if (elements.adminLogoutBtn) {
+    elements.adminLogoutBtn.addEventListener('click', handleAdminLogout);
+  }
+  
+  if (elements.extractForm) {
+    elements.extractForm.addEventListener('submit', handleFormSubmit);
+  }
+
+  if (elements.stopBtn) {
+    elements.stopBtn.addEventListener('click', stopExtraction);
+  }
+
+  if (elements.saveToNotepad) {
+    elements.saveToNotepad.addEventListener('click', saveNumbers);
+  }
+}
+
+// Form handling
+function handleFormVisibility() {
+  if (!elements.sourceSelect) return;
+
+  const source = elements.sourceSelect.value;
   const isPersonal = source === 'personal';
   const isCustom = source === 'custom';
 
-  document.getElementById('locationGroup').style.display = isPersonal || isCustom ? 'none' : 'block';
-  document.getElementById('searchTermGroup').style.display = 'block';
-  document.getElementById('customUrlGroup').style.display = isCustom ? 'block' : 'none';
-  document.getElementById('depthGroup').style.display = isCustom ? 'block' : 'none';
-  document.getElementById('pagesGroup').style.display = isCustom ? 'none' : 'block';
-
-  if (searchTermLabel) {
-    searchTermLabel.textContent = isPersonal ? 'Person Name' : 'Search Term';
+  if (elements.locationGroup) {
+    elements.locationGroup.style.display = isPersonal || isCustom ? 'none' : 'block';
+  }
+  
+  if (elements.searchTermGroup) {
+    elements.searchTermGroup.style.display = 'block';
+  }
+  
+  if (elements.customUrlGroup) {
+    elements.customUrlGroup.style.display = isCustom ? 'block' : 'none';
+  }
+  
+  if (elements.depthGroup) {
+    elements.depthGroup.style.display = isCustom ? 'block' : 'none';
+  }
+  
+  if (elements.pagesGroup) {
+    elements.pagesGroup.style.display = isCustom ? 'none' : 'block';
   }
 
-  if (pagesInput) {
-    pagesInput.max = isPersonal ? '1000' : '50'; // Adjust this as you like
+  if (elements.searchTermLabel) {
+    elements.searchTermLabel.textContent = isPersonal ? 'Person Name' : 'Search Term';
+  }
+
+  if (elements.pagesInput) {
+    elements.pagesInput.max = isPersonal ? '1000' : '50';
   }
 }
 
 function updateDepthValue() {
-  const depthInput = document.getElementById('depthPages');
-  const depthValue = document.getElementById('depthValue');
+  if (!elements.depthInput || !elements.depthValue) return;
 
-  if (depthInput && depthValue) {
-    const value = depthInput.value;
-    depthValue.textContent = `${value} page${value > 1 ? 's' : ''}`;
-  }
+  const value = elements.depthInput.value;
+  elements.depthValue.textContent = `${value} page${value > 1 ? 's' : ''}`;
 }
 
 function initExtractionForm() {
-  const sourceSelect = document.getElementById('source');
-  const depthInput = document.getElementById('depthPages');
-  const extractForm = document.getElementById('extractForm');
-
-  if (sourceSelect) {
-    sourceSelect.addEventListener('change', handleFormVisibility);
-    handleFormVisibility(); // Call once to set initial state
+  if (elements.sourceSelect) {
+    elements.sourceSelect.addEventListener('change', handleFormVisibility);
+    handleFormVisibility();
   }
 
-  if (depthInput) {
-    depthInput.addEventListener('input', updateDepthValue);
-    updateDepthValue(); // Call once to set initial value
-  }
-
-  if (extractForm) {
-    extractForm.addEventListener('submit', function (e) {
-      e.preventDefault();
-      // Add your extraction logic here
-      console.log('Extraction submitted');
-    });
+  if (elements.depthInput) {
+    elements.depthInput.addEventListener('input', updateDepthValue);
+    updateDepthValue();
   }
 }
 
-// Make sure DOM don ready before calling
 document.addEventListener('DOMContentLoaded', initExtractionForm);
 
 
-function showNumber(number, source) {
-  const resultTableBody = document.getElementById('resultTableBody');
+// Extraction functions
+async function handleFormSubmit(e) {
+  e.preventDefault();
   
+  if (!appState.isAuthenticated) {
+    showToast('Please sign in before extracting.', 'danger');
+    return;
+  }
+
+  // Set initial loading state
+  startLoading();
+
+  try {
+    const pagesRaw = elements.pagesInput.value.trim();
+    const pagesParsed = parseInt(pagesRaw, 10);
+    const pages = Number.isInteger(pagesParsed) && pagesParsed > 0 ? pagesParsed : 1;
+
+    const depthInput = elements.depthInput?.value.trim();
+    const depthParsed = depthInput ? parseInt(depthInput, 10) : 1;
+    const depth = Number.isInteger(depthParsed) && depthParsed > 0 ? depthParsed : 1;
+
+    const formData = {
+      source: elements.sourceSelect.value,
+      searchTerm: elements.searchTermInput.value.trim(),
+      location: elements.locationInput.value.trim(),
+      pages: pages,
+      url: elements.customUrlInput?.value.trim(),
+      depth: depth,
+      socketId: appState.socketId
+    };
+
+    updateProgress(10, "Validating inputs...");
+    
+    const endpoint = apiMap[formData.source];
+    if (!endpoint) throw new Error('Invalid source selected');
+
+    updateProgress(30, "Connecting to server...");
+    
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData)
+    });
+
+    updateProgress(60, "Processing request...");
+
+    if (!response.ok) {
+      let errorMessage = 'Extraction failed';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.error || errorMessage;
+      } catch {
+        const responseText = await response.text();
+        errorMessage = responseText || errorMessage;
+      }
+      throw new Error(errorMessage);
+    }
+
+    updateProgress(90, "Finalizing...");
+    
+    const sourceName = sourceDisplayNames?.[formData.source] || formData.source;
+    showToast(`${sourceName} extraction started`, 'success');
+    updateProgress(100, "Extraction in progress...");
+
+    // Keep progress visible for ongoing extraction
+    appState.isExtracting = true;
+    
+  } catch (err) {
+    showToast(err.message, 'danger');
+    console.error('Extraction error:', err);
+    stopLoading();
+    resetExtraction();
+  } finally {
+    // Don't fully stop loading if extraction is ongoing
+    if (!appState.isExtracting) {
+      stopLoading();
+    }
+  }
+}
+
+function stopExtraction() {
+  appState.isExtracting = false;
+  socket.emit('cancelScrape', { socketId: appState.socketId });
+  updateUI();
+  
+  if (elements.statusText) {
+    elements.statusText.textContent = 'Extraction stopped';
+  }
+}
+
+function startLoading() {
+  if (elements.submitButton) {
+    elements.submitButton.disabled = true;
+    elements.submitButton.classList.add('button-loading');
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.classList.add('button-loading');
+
+  if (spinner) {
+    spinner.style.display = 'inline-block'; // non-blocking
+  }
+}
+
+function stopLoading() {
+  const submitBtn = document.getElementById('submit-btn');
+  const spinner = document.getElementById('loading-spinner');
+
+  submitBtn.disabled = false;
+  submitBtn.classList.remove('button-loading');
+
+  if (spinner) {
+    spinner.style.display = 'none';
+  }
+}
+
+function updateProgress(percent, message) {
+  elements.progressBar.style.width = `${percent}%`;
+  elements.progressText.textContent = message;
+  elements.extractionStatus.textContent = message;
+  
+  // Change color based on progress
+  if (percent < 30) {
+    elements.progressBar.style.backgroundColor = '#ff9800'; // orange
+  } else if (percent < 70) {
+    elements.progressBar.style.backgroundColor = '#2196F3'; // blue
+  } else {
+    elements.progressBar.style.backgroundColor = '#4CAF50'; // green
+  }
+}
+
+function resetExtraction() {
+  appState.isExtracting = false;
+  stopLoading();
+  elements.progressContainer.style.display = 'none';
+  elements.extractionStatus.textContent = '';
+}
+
+function resetExtraction() {
+  appState.existingNumbers.clear();
+  appState.extractedNumbers = [];
+  
+  if (elements.resultTableBody) {
+    elements.resultTableBody.innerHTML = `
+      <tr>
+        <td colspan="7" class="text-center py-5 text-muted">
+          <i class="fas fa-inbox fa-3x mb-3"></i><br>
+          No results yet. Start extraction to see data.
+        </td>
+      </tr>
+    `;
+  }
+  
+  updateResultCount();
+}
+
+function showNumber(number, source) {
+  if (!elements.resultTableBody) return;
+
   // Clear "no results" message if present
-  if (resultTableBody.querySelector('td[colspan]')) {
-    resultTableBody.innerHTML = '';
+  if (elements.resultTableBody.querySelector('td[colspan]')) {
+    elements.resultTableBody.innerHTML = '';
   }
 
   const row = document.createElement('tr');
   row.dataset.number = number;
   row.innerHTML = `
-    <td>${resultTableBody.children.length + 1}</td>
+    <td>${elements.resultTableBody.children.length + 1}</td>
     <td>${number}</td>
     <td>${source || 'Unknown'}</td>
     <td>-</td>
@@ -602,7 +504,7 @@ function showNumber(number, source) {
     <td>-</td>
     <td class="text-muted">Unverified</td>
   `;
-  resultTableBody.appendChild(row);
+  elements.resultTableBody.appendChild(row);
 
   // Auto-scroll to bottom
   const tableResponsive = document.querySelector('.table-responsive');
@@ -618,102 +520,13 @@ function updateResultCount() {
   }
 }
 
-function resetExtraction() {
-  existingNumbers.clear();
-  extractedNumbers = [];
-  if (elements.resultTableBody) {
-    elements.resultTableBody.innerHTML = `
-      <tr>
-        <td colspan="7" class="text-center py-5 text-muted">
-          <i class="fas fa-inbox fa-3x mb-3"></i><br>
-          No results yet. Start extraction to see data.
-        </td>
-      </tr>
-    `;
-  }
-  updateResultCount();
-  isStopped = false;
-}
-
-function startLoading() {
-  if (statusText) statusText.textContent = 'Extracting...';
-}
-
-function stopLoading() {
-  if (statusText) statusText.textContent = isAuthenticated ? 'Ready' : 'Please sign in to extract';
-}
-
-// Update handleFormSubmit function
-async function handleFormSubmit(e) {
-  e.preventDefault();
-  if (!currentUser) {
-    showToast('Please sign in before extracting.', 'danger');
-    return;
-  }
-
-  resetExtraction();
-  startLoading();
-  isStopped = false;
-
-  const source = elements.sourceSelect.value;
-  const endpoint = apiMap[source];
-  
-  try {
-    const requestData = {
-      socketId: socket.id,
-      searchTerm: elements.searchTermInput.value.trim(),
-      location: elements.locationInput.value.trim(),
-      pages: parseInt(elements.pagesInput.value) || 1
-    };
-
-    // Add error handling for the fetch request
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestData)
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Request failed');
-    }
-
-    showToast(`${source} extraction started`, 'success');
-  } catch (err) {
-    console.error('Extraction error:', err);
-    showToast(err.message, 'danger');
-  } finally {
-    elements.extractBtn.disabled = false;
-    elements.stopBtn.disabled = true;
-    stopLoading();
-  }
-}
-
-function stopExtraction() {
-  isStopped = true;
-  socket.emit('cancelScrape');
-  
-  // UI updates
-  elements.extractBtn.disabled = false;
-  elements.stopBtn.disabled = true;
-  elements.statusText.textContent = 'Extraction stopped';
-  showToast('Extraction stopped', 'info');
-  
-  // If you have a progress bar
-  if (elements.extractionProgress) {
-    elements.extractionProgress.style.width = '0%';
-  }
-}
-
-// Add stop button event listener
-elements.stopBtn?.addEventListener('click', stopExtraction);
-
 function saveNumbers() {
-  if (extractedNumbers.length === 0) {
-    alert('No numbers to save.');
+  if (appState.extractedNumbers.length === 0) {
+    showToast('No numbers to save.', 'warning');
     return;
   }
-  const content = extractedNumbers.map(item => item.number).join('\n');
+  
+  const content = appState.extractedNumbers.map(item => item.number).join('\n');
   const blob = new Blob([content], { type: 'text/plain' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -725,6 +538,309 @@ function saveNumbers() {
   URL.revokeObjectURL(url);
 }
 
+// Auth functions
+async function handleUserLogin(e) {
+  e.preventDefault();
+  
+  const username = elements.usernameInput.value;
+  const password = elements.passwordInput.value;
+
+  try {
+    const response = await fetch('/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ username, password })
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      appState.currentUser = { username: data.username };
+      appState.isAuthenticated = true;
+      showToast('Signed in successfully!', 'success');
+      updateUI();
+      bootstrap.Modal.getInstance(document.getElementById('signInModal')).hide();
+    } else {
+      showToast(data.error || 'Invalid credentials', 'danger');
+    }
+  } catch (err) {
+    showToast('Login failed', 'danger');
+    console.error('Login error:', err);
+  }
+}
+
+async function handleSignOut() {
+  try {
+    await fetch('/logout', {
+      method: 'POST',
+      credentials: 'include'
+    });
+
+    appState.currentUser = null;
+    appState.isAuthenticated = false;
+    updateUI();
+    showToast('Signed out successfully', 'success');
+  } catch (err) {
+    showToast('Logout failed', 'danger');
+    console.error('Logout error:', err);
+  }
+}
+
+async function handleAdminLogin() {
+  const password = document.getElementById('adminPassword').value;
+
+  try {
+    const response = await fetch('/admin-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ password })
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      elements.adminLoginForm.style.display = 'none';
+      elements.adminPanel.style.display = 'block';
+      await fetchAndDisplayCredentials();
+      showToast('Admin login successful', 'success');
+    } else {
+      throw new Error(data.error || 'Wrong password');
+    }
+  } catch (err) {
+    showToast(err.message, 'danger');
+    console.error('Admin login error:', err);
+  }
+}
+
+async function handleAdminLogout() {
+  try {
+    await fetch('/logout', {
+      method: 'POST',
+      credentials: 'include'
+    });
+    elements.adminPanel.style.display = 'none';
+    elements.adminLoginForm.style.display = 'block';
+    document.getElementById('adminPassword').value = '';
+    
+    const tbody = document.getElementById('credentialsList');
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5" class="text-center py-4 text-muted">
+          No credentials generated yet
+        </td>
+      </tr>
+    `;
+    showToast('Admin logged out', 'info');
+  } catch (err) {
+    showToast('Logout failed', 'danger');
+    console.error('Admin logout error:', err);
+  }
+}
+
+async function fetchAndDisplayCredentials() {
+  try {
+    const response = await fetch('/get-credentials', {
+      credentials: 'include'
+    });
+    const data = await response.json();
+
+    if (!data.success) throw new Error(data.error || 'Failed to fetch credentials');
+
+    const tbody = document.getElementById('credentialsList');
+    tbody.innerHTML = '';
+
+    if (data.credentials.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" class="text-center py-4 text-muted">
+            No credentials generated yet
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    data.credentials.forEach(cred => {
+      const row = document.createElement('tr');
+      const expiresAt = cred.expires_at ? new Date(cred.expires_at) : null;
+      const isActive = !cred.revoked && (!expiresAt || expiresAt > new Date());
+
+      row.innerHTML = `
+        <td>${cred.username}</td>
+        <td>
+          <span class="password-mask" data-password="${cred.password}">*****</span>
+          <button class="btn btn-sm btn-outline-secondary ms-2 toggle-password">
+            Show
+          </button>
+        </td>
+        <td>${new Date(cred.created_at).toLocaleDateString()}</td>
+        <td>${expiresAt ? expiresAt.toLocaleDateString() : 'Never'}</td>
+        <td>${isActive ? 'Active' : 'Inactive'}</td>
+        <td>
+          <button class="btn btn-sm ${isActive ? 'btn-danger' : 'btn-success'}" 
+            data-action="toggle" data-username="${cred.username}">
+            ${isActive ? 'Revoke' : 'Activate'}
+          </button>
+          <button class="btn btn-sm btn-primary ms-1" 
+            data-action="extend" data-username="${cred.username}">
+            <i class="fas fa-plus"></i> Extend
+          </button>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+
+    document.querySelectorAll('[data-action="toggle"]').forEach(btn => {
+      btn.addEventListener('click', () => toggleCredential(btn.dataset.username));
+    });
+
+    document.querySelectorAll('[data-action="extend"]').forEach(btn => {
+      btn.addEventListener('click', () => extendCredential(btn.dataset.username));
+    });
+
+    document.querySelectorAll('.toggle-password').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const span = btn.previousElementSibling;
+        const realPassword = span.getAttribute('data-password');
+        const isHidden = span.textContent === '*****';
+
+        span.textContent = isHidden ? realPassword : '*****';
+        btn.textContent = isHidden ? 'Hide' : 'Show';
+      });
+    });
+
+  } catch (err) {
+    showToast(err.message, 'danger');
+    console.error('Credentials fetch error:', err);
+  }
+}
+
+async function toggleCredential(username) {
+  try {
+    const btn = document.querySelector(`[data-action="toggle"][data-username="${username}"]`);
+    const revoke = btn.textContent.trim() === 'Revoke';
+
+    const response = await fetch('/toggle-credential', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ username, revoke })
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      showToast(`Credential ${username} ${revoke ? 'revoked' : 'activated'}`, 'success');
+      await fetchAndDisplayCredentials();
+    } else {
+      throw new Error(data.error || 'Failed to toggle credential');
+    }
+  } catch (err) {
+    showToast(err.message, 'danger');
+    console.error('Toggle credential error:', err);
+  }
+}
+
+async function extendCredential(username) {
+  try {
+    const response = await fetch('/extend-credential', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ username, days: 7 })
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      showToast(`Extended ${username} by 7 days`, 'success');
+      await fetchAndDisplayCredentials();
+    } else {
+      throw new Error(data.error || 'Failed to extend credential');
+    }
+  } catch (err) {
+    showToast(err.message, 'danger');
+    console.error('Extend credential error:', err);
+  }
+}
+
+// Helper functions
+function showToast(message, type = 'success') {
+  const toastId = 'toast-' + Date.now();
+  const toastHTML = `
+    <div id="${toastId}" class="toast show align-items-center text-bg-${type}" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body">
+          <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} me-2"></i>
+          ${message}
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  `;
+
+  const container = document.querySelector('.toast-container') || document.body;
+  container.insertAdjacentHTML('beforeend', toastHTML);
+
+  setTimeout(() => {
+    const toast = document.getElementById(toastId);
+    if (toast) {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    }
+  }, 5000);
+}
+
+// Initialize admin modal
+if (document.getElementById('adminModal')) {
+  document.getElementById('adminModal').addEventListener('show.bs.modal', () => {
+    elements.adminLoginForm.style.display = 'block';
+    elements.adminPanel.style.display = 'none';
+    document.getElementById('adminPassword').value = '';
+  });
+}
+
+socket.on('extraction-result', (data) => {
+  const tbody = document.getElementById('resultTableBody');
+  const row = document.createElement('tr');
+  row.setAttribute('data-number', data.phone);
+  row.innerHTML = `
+    <td>${tbody.children.length + 1}</td>
+    <td>${data.phone}</td>
+    <td>${data.source}</td>
+    <td>${data.type}</td>
+    <td>${data.country}</td>
+    <td>${data.carrier}</td>
+    <td class="text-success">${data.status}</td>
+  `;
+  tbody.appendChild(row);
+
+  document.getElementById('resultCount').textContent = `${tbody.children.length} numbers`;
+});
+
+// Generate new credentials
+document.getElementById('generateCredentialsBtn').addEventListener('click', async () => {
+  const username = document.getElementById('generateUsername').value;
+  const tableBody = document.getElementById('credentialsList');
+
+  try {
+    const response = await fetch('/generate-credentials', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ username })
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to generate credentials');
+    }
+
+    showToast('Credentials generated successfully!', 'success');
+    await fetchAndDisplayCredentials(); // Refresh the list
+  } catch (err) {
+    showToast(err.message, 'danger');
+    console.error('Request failed:', err);
+  }
+});
 
 function updateCredentialsList() {
   if (!credentialsList) return;
@@ -778,7 +894,6 @@ function generatePassword() {
   return password;
 }
 
-
 function validateUserCredentials(username, password) {
   const cred = credentialsData[username];
   if (!cred) return false;
@@ -830,3 +945,39 @@ function isValidProxy(proxy) {
     return num >= 0 && num <= 255;
   });
 }
+
+// main.js - Complete verification
+async function verifySelectedNumbers() {
+  const selected = Array.from(document.querySelectorAll('#verifyNumbersList input[type="checkbox"]:checked'))
+    .map(el => el.closest('tr').querySelector('td:nth-child(2)').textContent);
+
+  try {
+    const response = await fetch('/verify-numbers', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ numbers: selected })
+    });
+    
+    const data = await response.json();
+    updateVerificationResults(data.results);
+  } catch (err) {
+    showToast('Verification failed', 'danger');
+  }
+}
+
+function updateVerificationResults(results) {
+  results.forEach(result => {
+    const row = document.querySelector(`tr[data-number="${result.phone}"]`);
+    if (row) {
+      row.cells[6].textContent = result.valid ? 'Valid' : 'Invalid';
+      row.cells[6].className = result.valid ? 'text-success' : 'text-danger';
+    }
+  });
+}
+
+socket.on('cancelScrape', ({ socketId }) => {
+  if (activeBrowsers[socketId]) {
+    activeBrowsers[socketId].browser.close();
+    delete activeBrowsers[socketId];
+  }
+});

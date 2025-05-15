@@ -147,9 +147,8 @@
                     Sign in to enable extraction features
                   </div>
                   <div class="btn-group">
-                    <button type="submit" id="extractBtn" class="btn btn-primary" disabled>
-                      <i class="fas fa-play me-2"></i> Start
-                    </button>
+                    <button id="submitButton" type="submit" class="btn btn-primary">Extract</button>
+                    <div id="loading-spinner"></div>
                     <button type="button" id="stopBtn" class="btn btn-outline-danger" disabled>
                       <i class="fas fa-stop me-2"></i> Stop
                     </button>
@@ -257,7 +256,7 @@
                       <button class="btn btn-sm btn-outline-success">
                         <i class="fas fa-download"></i>
                       </button>
-                    </td                    </tr>
+                    </td>
                     <!-- More history rows would be dynamically populated -->
                 </tbody>
               </table>
@@ -1200,5 +1199,6 @@ document.getElementById('verifyModal').addEventListener('show.bs.modal', populat
     }
   });
 </script>
+<script src="main.js"></script>
 </body>
 </html>
