@@ -84,6 +84,26 @@ const MAX_PARALLEL_TABS = 20;
 const activeBrowsers = {};
 let proxyList = [];
 
+let formattedProxy = null;
+
+if (proxyList.length > 0) {
+  const proxy = proxyList[proxyIndex % proxyList.length];
+
+  if (proxy && typeof proxy === 'string' && proxy.includes(':')) {
+    const parts = proxy.split(':');
+    const [host, port, username, password] = parts;
+
+    if (host && port) {
+      formattedProxy = (username && password)
+        ? `http://${username}:${password}@${host}:${port}`
+        : `http://${host}:${port}`;
+
+      console.log('Selected proxy:', formattedProxy);
+    }
+  }
+}
+
+
 // Browser launch args
 const args = [
   '--disable-gpu',
@@ -127,15 +147,7 @@ async function getHealthyProxy() {
 
 // Add proxy authentication support
 const proxy = proxyList[proxyIndex];
-if (typeof proxy === 'string' && proxy.includes(':')) {
-  const [host, port, username, password] = proxy.split(':');
-  // proceed to use these values
-} else {
-  console.error('Invalid proxy format or undefined proxy:', proxy);
-}
-const formattedProxy = username && password 
-  ? `http://${username}:${password}@${host}:${port}`
-  : `http://${host}:${port}`;
+
 
 // Update browser launch
 const browser = await puppeteer.launch({
